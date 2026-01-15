@@ -18,4 +18,10 @@ public class MainController {
         System.out.println("login");
         return "views/login";
     }
+    
+    @GetMapping("/signup")
+    String signup() {
+    	System.out.println("signup");
+    	return "views/signup";
+    }
 }

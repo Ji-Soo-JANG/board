@@ -9,7 +9,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import com.jisoo.board.mapper.UserMapper;
 
 
-@SpringBootTest(classes = TaskApplication.class)
+@SpringBootTest()
 class DbConnectionTest {
 
     @Autowired

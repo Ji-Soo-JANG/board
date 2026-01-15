@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+  <mapper namespace="com.jisoo.board.mapper.UserMapper">
+  	<!-- 重複確認 -->
+  	<select id="checkId" resultType="int">
+  		select count(*)
+  		from TBL_USER
+  		where USERID = #{userId}
+  	</select>
+  </mapper>

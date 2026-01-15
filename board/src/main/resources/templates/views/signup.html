@@ -7,6 +7,46 @@
         rel="stylesheet">
 </head>
 
+<!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+<script>
+	$(function(){
+		$("#btnCheck").on("click", function(){
+			const userId = $("#inputId").val().trim();
+			
+			if(!userId){
+				alert("IDを入力してください。");
+				return;	
+			}
+			
+			$.ajax({
+				url: "/signup/check-id",
+				type: "GET",
+				data: {id: userId},
+				dataType: "json",
+				success: function(res){
+					if(res.available){
+						$("#idCheck")
+						.text("このIDは使えます。")
+						.removeAttr("hidden")
+						.css("color", "blue");
+					}else{
+						$("#idCheck")
+						.text("このIDは使えません。")
+						.removeAttr("hidden")
+						.css("color", "red");
+					}
+				},
+				
+				error: function(){
+					alert("サーバーにエラーが発生しました。");
+				}
+				
+			});
+		});
+	});
+</script>
 <body>
 
 <!-- ===== Header ===== -->
@@ -21,11 +61,14 @@
 <main class="container mt-4">
   <div class="row">
 	<h1>新規登録</h1>
-	<input type="text" class="form-control" placeholder="ID">
-	<button>중복확인</button>
-	<input type="text" class="form-control" placeholder="PW">
-	<span hidden>패스워드 확인</span>
-	<input type="text" class="form-control" placeholder="PW">
+	<form>
+		<input id="inputId" type="text" class="form-control" placeholder="ID">
+		<span id="idCheck" hidden></span>
+		<button id="btnCheck">重複確認</button>
+		<input type="text" class="form-control" placeholder="PW">
+		<span id="pwCheck" hidden></span>
+		<input type="text" class="form-control" placeholder="PW">
+	</form>
   </div>
 </main>
 

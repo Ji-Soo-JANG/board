@@ -43,6 +43,12 @@
 		  <artifactId>spring-boot-starter-jdbc</artifactId>
 		</dependency>
 		
+		<!-- Spring boot Security-->
+		<dependency>
+		  <groupId>org.springframework.boot</groupId>
+		  <artifactId>spring-boot-starter-security</artifactId>
+		</dependency>
+		
 		<!-- thymeleaf -->
 		<dependency>
 		  <groupId>org.springframework.boot</groupId>

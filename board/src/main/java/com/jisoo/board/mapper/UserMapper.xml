@@ -10,4 +10,9 @@
   		from TBL_USER
   		where USERID = #{userId}
   	</select>
+  	
+  	<insert id="insertUser">
+  		insert into TBL_USER(userId, pw)
+  		values(#{userId}, #{userPw})
+  	</insert>
   </mapper>

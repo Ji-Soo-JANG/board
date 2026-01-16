@@ -6,4 +6,6 @@ import org.springframework.stereotype.Service;
 public interface UserService {
 	
 	public boolean isAvailable(String id);
+
+	public boolean signup(String userId, String userPw);
 }

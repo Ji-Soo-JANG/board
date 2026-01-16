@@ -11,8 +11,21 @@
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 
 <script>
+	var idOk = false;
+	var pwOk = false;
+	
+	function updateSubmitBtn() {
+		  if (idOk && pwOk) {
+		    $("#btnSubmit").prop("disabled", false).removeAttr("hidden");
+		  } else {
+		    $("#btnSubmit").prop("disabled", true).attr("hidden", true);
+		  }
+		}
+	
 	$(function(){
-		$("#btnCheck").on("click", function(){
+		$("#btnCheck").on("click", function(e){
+			e.preventDefault();
+
 			const userId = $("#inputId").val().trim();
 			
 			if(!userId){
@@ -31,19 +44,84 @@
 						.text("このIDは使えます。")
 						.removeAttr("hidden")
 						.css("color", "blue");
-					}else{
+						
+						idOk = true;
+						
+					} else{
 						$("#idCheck")
 						.text("このIDは使えません。")
 						.removeAttr("hidden")
 						.css("color", "red");
+						
+						idOk = false;
 					}
+					
+					updateSubmitBtn();
 				},
 				
 				error: function(){
 					alert("サーバーにエラーが発生しました。");
-				}
+				},
 				
+				complete: function(){
+					$("#btnCheck").prop("disabled", true);
+				}
 			});
+		});
+		
+		$("#inputId").on("input", function(){
+			idOk = false;
+			updateSubmitBtn();
+			$("#btnCheck").prop("disabled", false);
+			$("#idCheck").attr("hidden", true);
+		})
+		
+		$("#pwConfirm").on("input", function(){
+			pwOk = false;
+			const pw = $("#inputPw").val();
+			const pwConfirm = $(this).val();
+			
+			if(pw == pwConfirm){
+				$("#pwCheck")
+				.text("パスワードが一致します。")
+				.css("color", "blue")
+				.removeAttr("hidden");
+				pwOk = true;
+			} else{
+				$("#pwCheck")
+				.text("パスワードが一致しません。")
+				.css("color", "red")
+				.removeAttr("hidden");
+				pwOk = false;
+			}
+			updateSubmitBtn();
+		})
+		
+		$("#signupForm").on("submit", function(e){
+		  e.preventDefault();
+
+		  $.ajax({
+		    url: "/signup",
+		    type: "POST",
+		    data: {
+		      inputId: $("#inputId").val().trim(),
+		      inputPw: $("#inputPw").val()
+		    },
+		    dataType: "json",
+			
+		    success: function(res){
+		      if(res.success){
+		        alert("登録が完了しました。");
+				location.href="/login";
+		      } else {
+		        alert("登録に失敗しました。");
+		      }
+		    },
+			
+		    error: function(){
+		      alert("サーバーエラーが発生しました。");
+		    }
+		  });
 		});
 	});
 </script>
@@ -61,13 +139,14 @@
 <main class="container mt-4">
   <div class="row">
 	<h1>新規登録</h1>
-	<form>
-		<input id="inputId" type="text" class="form-control" placeholder="ID">
-		<span id="idCheck" hidden></span>
+	<form id="signupForm" method="post" action="/signup">
+		<input id="inputId" name="inputId" type="text" class="form-control" placeholder="IDを入力してください">
+		<span id="idCheck" hidden></span><br>
 		<button id="btnCheck">重複確認</button>
-		<input type="text" class="form-control" placeholder="PW">
+		<input id="inputPw" name="inputPw" type="password" class="form-control" placeholder="パスワード">
 		<span id="pwCheck" hidden></span>
-		<input type="text" class="form-control" placeholder="PW">
+		<input id="pwConfirm" type="password" class="form-control" placeholder="パスワード確認">
+		<button id="btnSubmit" hidden disabled>登録</button>
 	</form>
   </div>
 </main>

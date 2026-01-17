@@ -1,16 +1,20 @@
 package com.jisoo.board.service;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.jisoo.board.domain.UserSignupDto;
 import com.jisoo.board.mapper.UserMapper;
 
+
 @Service
 public class UserServiceImpl implements UserService {
 	private final UserMapper userMapper;
+	private final PasswordEncoder passwordEncoder;
 	
-	public UserServiceImpl(UserMapper userMapper) {
+	public UserServiceImpl(UserMapper userMapper, PasswordEncoder passwordEncoder) {
 		this.userMapper = userMapper;
+		this.passwordEncoder = passwordEncoder;
 	}
 	
 	@Override
@@ -21,12 +25,13 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public boolean signup(UserSignupDto dto) {
-		  // 1. ID 중복 최종 확인
         if (userMapper.checkId(dto.getLoginId()) > 0) {
             return false;
         }
         
-        userMapper.insertUser(dto.getLoginId(), dto.getPassword(), dto.getNickname());
+        String password = passwordEncoder.encode(dto.getPassword());
+        
+        userMapper.insertUser(dto.getLoginId(), password, dto.getNickname());
         return true;
 	}
 }

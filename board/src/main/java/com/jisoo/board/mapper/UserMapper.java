@@ -10,5 +10,5 @@ public interface UserMapper {
 	 int ping();
 	 
 	 public int checkId(@Param("userId") String userId);
-	 public boolean insertUser(@Param("userId") String userId, @Param("userPw") String userPw);
+	 public boolean insertUser(@Param("userId") String userId, @Param("userPw") String userPw, @Param("nickname") String nickname);
 }

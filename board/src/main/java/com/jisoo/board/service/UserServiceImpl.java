@@ -2,6 +2,7 @@ package com.jisoo.board.service;
 
 import org.springframework.stereotype.Service;
 
+import com.jisoo.board.domain.UserSignupDto;
 import com.jisoo.board.mapper.UserMapper;
 
 @Service
@@ -13,19 +14,19 @@ public class UserServiceImpl implements UserService {
 	}
 	
 	@Override
-	public boolean isAvailable(String id) {
-		return userMapper.checkId(id) == 0;
+	public boolean isAvailable(String userId) {
+//		System.out.println("service-isAvailable");
+		return userMapper.checkId(userId) == 0;
 	}
 
 	@Override
-	public boolean signup(String userId, String userPw) {
+	public boolean signup(UserSignupDto dto) {
 		  // 1. ID 중복 최종 확인
-        if (userMapper.checkId(userId) > 0) {
+        if (userMapper.checkId(dto.getLoginId()) > 0) {
             return false;
         }
-
-        // 2. 비밀번호 암호화 (지금은 plain, 다음 단계에서 BCrypt)
-        userMapper.insertUser(userId, userPw);
+        
+        userMapper.insertUser(dto.getLoginId(), dto.getPassword(), dto.getNickname());
         return true;
 	}
 }

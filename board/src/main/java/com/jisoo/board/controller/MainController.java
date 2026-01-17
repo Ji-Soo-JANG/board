@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.jisoo.board.domain.UserSignupDto;
 import com.jisoo.board.service.UserService;
 
 @Controller
@@ -47,11 +48,9 @@ public class MainController {
     
     @PostMapping("/signup")
     @ResponseBody
-    public Map<String, Boolean> signup(
-            @RequestParam("inputId") String userId,
-            @RequestParam("inputPw") String userPw
+    public Map<String, Boolean> signup(UserSignupDto dto
     ) {
-        boolean success = userService.signup(userId, userPw);
+        boolean success = userService.signup(dto);
 
         System.out.println("result : " + success);
         Map<String, Boolean> result = new HashMap<>();

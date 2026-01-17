@@ -8,11 +8,11 @@
   	<select id="checkId" resultType="int">
   		select count(*)
   		from TBL_USER
-  		where USERID = #{userId}
+  		where LOGIN_ID = #{userId}
   	</select>
   	
   	<insert id="insertUser">
-  		insert into TBL_USER(userId, pw)
-  		values(#{userId}, #{userPw})
+  		insert into TBL_USER(LOGIN_ID, PASSWORD, NICKNAME)
+  		values(#{userId}, #{userPw}, #{nickname})
   	</insert>
   </mapper>

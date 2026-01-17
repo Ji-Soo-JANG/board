@@ -7,8 +7,42 @@
         rel="stylesheet">
 </head>
 
+<!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script>
+	var idOk = false;
+	var pwOk = false;
+	
+	$(function(){
+		$("#btnNext").on("click", function(e){
+			e.preventDefault();
+			
+			var userId = $("#inputId").val().trim();
+			
+			if(!idOk){
+				
+				$.ajax({
+					url: "/signup/check-id",
+					type: "GET",
+					data: {id: userId},
+					dataType: "json",
+					success: function(res){
+						if(!res.available){
+							$("#inputPw").removeAttr("hidden");
+							idOk = true;
+						} else{
+							alert("そのIDはありません。");
+						}
+					}});
+			}//if
+			else{
+				$("#loginForm").submit();
+			}
+			
+		});
+	})
+</script>
 <body>
-
 <!-- ===== Header ===== -->
 <header class="border-bottom py-3">
   <div class="container d-flex align-items-center">
@@ -20,15 +54,20 @@
 <!-- ===== body ===== -->
 <main class="container mt-4">
   <div class="row">
-	<h1>ログイン</h1>
-	<input type="text" class="form-control" placeholder="ID">
-	<button>次へ</button>
-	<a href="#">ログインができない場合</a>
-	<a href="signup">新規登録</a>
-	<input type="checkbox" hidden>
-	<span hidden>ログインしたままにする</span>
-	<a href="#" hidden>バスワードを忘れた場合</a>
+	<form id="loginForm" action="/login" method="post">
+		<h1>ログイン</h1>
+		<input id="inputId" name="inputId" type="text" class="form-control" placeholder="ID">
+		<input id="inputPw" name="inputPw" type="password" class="form-control" placeholder="PW" hidden>
+		<button type="button" id="btnNext">次へ</button><br>
+		<a href="#">ログインができない場合</a><br>
+		<a href="signup">新規登録</a>
+		<input type="checkbox" hidden>
+		<span hidden>ログインしたままにする</span>
+		<a href="#" hidden>バスワードを忘れた場合</a>
+	</form>		
   </div>
+
+  
 </main>
 
 <!-- ===== Footer ===== -->

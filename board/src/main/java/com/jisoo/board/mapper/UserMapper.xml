@@ -15,4 +15,18 @@
   		insert into TBL_USER(LOGIN_ID, PASSWORD, NICKNAME)
   		values(#{userId}, #{userPw}, #{nickname})
   	</insert>
+  	
+  	<select id="findByLoginId" parameterType="string" resultType="com.jisoo.board.domain.UserVo">
+	  SELECT
+	    USER_ID,
+	    LOGIN_ID,
+	    PASSWORD,
+	    NICKNAME,
+	    ROLE,
+	    CREATED_AT,
+	    UPDATED_AT,
+	    DELETED_AT
+	  FROM TBL_USER
+	  WHERE LOGIN_ID = #{loginId}
+	</select>
   </mapper>

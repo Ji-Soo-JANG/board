@@ -104,8 +104,9 @@
 		    url: "/signup",
 		    type: "POST",
 		    data: {
-		      inputId: $("#inputId").val().trim(),
-		      inputPw: $("#inputPw").val()
+		      loginId: $("#inputId").val().trim(),
+		      password: $("#inputPw").val(),
+			  nickname: $("#inputNickname").val().trim()
 		    },
 		    dataType: "json",
 			
@@ -143,6 +144,7 @@
 		<input id="inputId" name="inputId" type="text" class="form-control" placeholder="IDを入力してください">
 		<span id="idCheck" hidden></span><br>
 		<button id="btnCheck">重複確認</button>
+		<input id="inputNickname" name="inputNickname" type="text" class="form-control" placeholder="ニックネーム">
 		<input id="inputPw" name="inputPw" type="password" class="form-control" placeholder="パスワード">
 		<span id="pwCheck" hidden></span>
 		<input id="pwConfirm" type="password" class="form-control" placeholder="パスワード確認">

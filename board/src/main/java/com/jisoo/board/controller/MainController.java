@@ -37,8 +37,8 @@ public class MainController {
     
     @GetMapping("/signup/check-id")
     @ResponseBody
-    public Map<String, Boolean> checkId(@RequestParam String id){
-    	boolean available = userService.isAvailable(id);
+    public Map<String, Boolean> checkIdAvailabile(@RequestParam String id){
+    	boolean available = userService.isLoginIdAvailable(id);
 		
 		Map<String, Boolean> result = new HashMap<>();
 		result.put("available", available);
@@ -52,9 +52,26 @@ public class MainController {
     ) {
         boolean success = userService.signup(dto);
 
-        System.out.println("result : " + success);
+//        System.out.println("result : " + success);
         Map<String, Boolean> result = new HashMap<>();
         result.put("success", success);
         return result;
     }
+    
+    @GetMapping("/auth/check-id")
+    @ResponseBody
+    public Map<String, Boolean> checkIdExists(@RequestParam String id) {
+		boolean isChecked = userService.existsLoginId(id);
+//		System.out.println("isChecked: " + isChecked);
+		Map<String, Boolean> result = new HashMap<>();
+		result.put("isChecked", isChecked);
+    	
+    	return result;
+    }
+    
+    @GetMapping("/mypage")
+    public String mypage() {
+        return "views/mypage";
+    }
+    
 }

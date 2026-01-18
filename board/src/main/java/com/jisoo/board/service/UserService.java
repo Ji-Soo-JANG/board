@@ -7,7 +7,7 @@ import com.jisoo.board.domain.UserSignupDto;
 @Service
 public interface UserService {
 	
-	public boolean isAvailable(String id);
-
+	public boolean isLoginIdAvailable(String id);
+	public boolean existsLoginId(String id);
 	public boolean signup(UserSignupDto dto);
 }

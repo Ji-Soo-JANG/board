@@ -11,7 +11,7 @@ public interface UserMapper {
 	 @Select("select 1 from dual")
 	 int ping();
 	 
-	 public int checkId(@Param("userId") String userId);
+	 public int existsByLoginId(@Param("userId") String userId);
 	 public boolean insertUser(@Param("userId") String userId, @Param("userPw") String userPw, @Param("nickname") String nickname);
 	 public UserVo findByLoginId(@Param("loginId") String loginId);
 }

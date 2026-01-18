@@ -12,7 +12,7 @@
 <script>
 	const p = new URLSearchParams(location.search);
 	if (p.has("error")){
-		alert("아이디 또는 비밀번호가 올바르지 않습니다.");
+		alert("		パスワードが正しくありません。");
 		location.href = "/login";		
 	}
 	
@@ -27,12 +27,12 @@
 			if(!idOk){
 				
 				$.ajax({
-					url: "/signup/check-id",
+					url: "/auth/check-id",
 					type: "GET",
 					data: {id: userId},
 					dataType: "json",
 					success: function(res){
-						if(!res.available){
+						if(res.isChecked){
 							$("#inputId").attr("disabled", true);							
 							$("#inputPw").removeAttr("hidden");
 							$("#btnPrev").removeAttr("hidden");
@@ -81,8 +81,6 @@
 		<button type="button" id="btnNext">次へ</button><br>
 		<a href="#">ログインができない場合</a><br>
 		<a href="signup">新規登録</a>
-		<input type="checkbox" hidden>
-		<span hidden>ログインしたままにする</span>
 		<a href="#" hidden>バスワードを忘れた場合</a>
 	</form>		
   </div>

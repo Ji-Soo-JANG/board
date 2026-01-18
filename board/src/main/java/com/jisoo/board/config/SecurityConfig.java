@@ -22,7 +22,7 @@ public class SecurityConfig {
         	.csrf(csrf -> csrf.disable())
         
             .authorizeHttpRequests(auth -> auth
-                .antMatchers("/login", "/signup/**").permitAll()
+                .antMatchers("/login", "/auth/**", "/signup/**").permitAll()
             	.anyRequest().authenticated()
                 
             )

@@ -18,14 +18,13 @@ public class UserServiceImpl implements UserService {
 	}
 	
 	@Override
-	public boolean isAvailable(String userId) {
-//		System.out.println("service-isAvailable");
-		return userMapper.checkId(userId) == 0;
+	public boolean isLoginIdAvailable(String userId) {
+		return userMapper.existsByLoginId(userId) == 0;
 	}
 
 	@Override
 	public boolean signup(UserSignupDto dto) {
-        if (userMapper.checkId(dto.getLoginId()) > 0) {
+        if (userMapper.existsByLoginId(dto.getLoginId()) > 0) {
             return false;
         }
         
@@ -33,5 +32,10 @@ public class UserServiceImpl implements UserService {
         
         userMapper.insertUser(dto.getLoginId(), password, dto.getNickname());
         return true;
+	}
+
+	@Override
+	public boolean existsLoginId(String userId) {
+		return userMapper.existsByLoginId(userId) > 0;
 	}
 }

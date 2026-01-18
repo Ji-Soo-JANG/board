@@ -33,7 +33,11 @@ public class SecurityConfig {
             		.usernameParameter("inputId")
             		.passwordParameter("inputPw")
             		.defaultSuccessUrl("/", true)
-            	);
+            	)
+            .logout(logout -> logout
+            		.logoutUrl("/logout")
+            		.logoutSuccessUrl("/login")
+            		);
         return http.build();
     }
 

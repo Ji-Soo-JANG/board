@@ -10,8 +10,13 @@
 <!-- jQuery -->
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script>
+	const p = new URLSearchParams(location.search);
+	if (p.has("error")){
+		alert("아이디 또는 비밀번호가 올바르지 않습니다.");
+		location.href = "/login";		
+	}
+	
 	var idOk = false;
-	var pwOk = false;
 	
 	$(function(){
 		$("#btnNext").on("click", function(e){
@@ -28,7 +33,9 @@
 					dataType: "json",
 					success: function(res){
 						if(!res.available){
+							$("#inputId").attr("disabled", true);							
 							$("#inputPw").removeAttr("hidden");
+							$("#btnPrev").removeAttr("hidden");
 							idOk = true;
 						} else{
 							alert("そのIDはありません。");
@@ -36,10 +43,22 @@
 					}});
 			}//if
 			else{
+				$("#inputId").removeAttr("disabled");
 				$("#loginForm").submit();
 			}
 			
 		});
+		
+		$("#btnPrev").on("click", function(e){
+			e.preventDefault();
+			
+			$("#inputId").removeAttr("disabled").val("");							
+			$("#inputPw").attr("hidden" ,true).val("");
+			$("#btnPrev").attr("hidden" ,true);
+			idOk = false;
+			
+		});
+		
 	})
 </script>
 <body>
@@ -58,6 +77,7 @@
 		<h1>ログイン</h1>
 		<input id="inputId" name="inputId" type="text" class="form-control" placeholder="ID">
 		<input id="inputPw" name="inputPw" type="password" class="form-control" placeholder="PW" hidden>
+		<button type="button" id="btnPrev" hidden>前へ</button>
 		<button type="button" id="btnNext">次へ</button><br>
 		<a href="#">ログインができない場合</a><br>
 		<a href="signup">新規登録</a>

@@ -10,28 +10,32 @@ import org.springframework.security.core.userdetails.UserDetails;
 import com.jisoo.board.domain.UserVo;
 
 public class SecurityUser implements UserDetails {
-	private final UserVo user;
-	
-	public SecurityUser(UserVo user) {
-		this.user = user;
+	private final UserVo userVo;
+
+	public SecurityUser(UserVo userVo) {
+		this.userVo = userVo;
+	}
+
+	public Long getUserId() {
+		return userVo.getUserId();
 	}
 	
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
 		// TODO Auto-generated method stub
-		return List.of(new SimpleGrantedAuthority(user.getRole()));
+		return List.of(new SimpleGrantedAuthority(userVo.getRole()));
 	}
 
 	@Override
 	public String getPassword() {
 		// TODO Auto-generated method stub
-		return user.getPassword();
+		return userVo.getPassword();
 	}
 
 	@Override
 	public String getUsername() {
 		// TODO Auto-generated method stub
-		return user.getLoginId();
+		return userVo.getLoginId();
 	}
 
 	@Override

@@ -14,4 +14,8 @@ public interface UserMapper {
 	 public int existsByLoginId(@Param("userId") String userId);
 	 public boolean insertUser(@Param("userId") String userId, @Param("userPw") String userPw, @Param("nickname") String nickname);
 	 public UserVo findByLoginId(@Param("loginId") String loginId);
+	 public UserVo findByUserId(@Param("userId") Long userId);
+	 public String findPasswordByUserId(@Param("userId") Long userId);
+	 public int updateUserInfo(@Param("userId") Long userId, @Param("nickname") String nickname);
+	 public int updatePassword(@Param("userId") Long userId, @Param("password") String password);
 }

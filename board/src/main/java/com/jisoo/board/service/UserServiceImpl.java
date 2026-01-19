@@ -4,6 +4,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.jisoo.board.domain.UserSignupDto;
+import com.jisoo.board.domain.UserVo;
 import com.jisoo.board.mapper.UserMapper;
 
 
@@ -37,5 +38,36 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public boolean existsLoginId(String userId) {
 		return userMapper.existsByLoginId(userId) > 0;
+	}
+
+	@Override
+	public boolean checkPassword(Long userId, String pw) {
+		String encodedPassword = userMapper.findPasswordByUserId(userId);
+        return passwordEncoder.matches(pw, encodedPassword);
+	}
+
+	@Override
+	public UserVo findByUserId(Long userId) {
+		UserVo userVo = userMapper.findByUserId(userId);
+		return userVo;
+	}
+
+	@Override
+	public boolean updateUserInfo(Long userId, String nickname) {
+		int update = userMapper.updateUserInfo(userId, nickname);
+		if(update == 1) {
+			return true;
+		}
+		return false;
+	}
+
+	@Override
+	public boolean updatePassword(Long userId, String password) {
+		String newPassword = passwordEncoder.encode(password);
+		int update = userMapper.updatePassword(userId, newPassword);
+		if(update == 1) {
+			return true;
+		}
+		return false;
 	}
 }

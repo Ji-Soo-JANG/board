@@ -1,9 +1,9 @@
 package com.jisoo.board.controller;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -12,17 +12,25 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.jisoo.board.domain.BoardVo;
 import com.jisoo.board.domain.MyPageDto;
 import com.jisoo.board.domain.UserSignupDto;
 import com.jisoo.board.domain.UserVo;
 import com.jisoo.board.security.SecurityUser;
+import com.jisoo.board.service.BoardService;
 import com.jisoo.board.service.UserService;
 
 @Controller
 public class MainController {
 
-	@Autowired
-	UserService userService;
+	private final UserService userService;
+	private final BoardService boardService;
+	
+	public MainController(UserService userService, BoardService boardService) {
+		this.userService = userService;
+		this.boardService = boardService;
+	}
+	
 	
     @GetMapping("/")
     String home(Model model) {
@@ -118,6 +126,13 @@ public class MainController {
     	result.put("update", update);
 //    	System.out.println("result: " + result);
     	return result;
+    }
+    
+    @GetMapping("/board")
+    public String boards(Model model) {
+    	List<BoardVo> list = boardService.getAllBoards();
+    	model.addAttribute("list", list);
+        return "views/boardList";
     }
     
     

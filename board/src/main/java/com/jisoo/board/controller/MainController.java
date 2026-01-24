@@ -21,6 +21,8 @@ import com.jisoo.board.domain.UserVo;
 import com.jisoo.board.security.SecurityUser;
 import com.jisoo.board.service.BoardService;
 import com.jisoo.board.service.UserService;
+import org.springframework.web.bind.annotation.RequestBody;
+
 
 @Controller
 public class MainController {
@@ -196,6 +198,19 @@ public class MainController {
     	boardService.updateBoard(boardVo);
     	
     	return "redirect:/board/" + boardId;
+    }
+    
+    
+    @PostMapping("/board/delete/{boardId}")
+    public String deleteBoard(@PathVariable("boardId") Long boardId,
+    		@AuthenticationPrincipal SecurityUser securityUser) {
+    	if(securityUser == null || !boardService.isOwner(boardId, securityUser.getUserId())) {
+    		return "redirect:/board";
+    	}
+    	
+    	boardService.deleteBoard(boardId);
+    	
+		return "redirect:/board";
     }
     
 }

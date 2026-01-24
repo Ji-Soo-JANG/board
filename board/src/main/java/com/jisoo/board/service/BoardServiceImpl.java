@@ -51,6 +51,15 @@ public class BoardServiceImpl implements BoardService{
 		}
 		return false;
 	}
+
+	@Override
+	public boolean deleteBoard(Long boardId) {
+		int delete = boardMapper.deleteBoard(boardId);
+		if(delete == 1) {
+			return true;
+		}
+		return false;
+	}
 	
 	
 }

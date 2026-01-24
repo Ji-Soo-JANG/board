@@ -64,6 +64,7 @@ public class BoardServiceTest {
 		System.out.println("isOwner: " + isOwner);
 	}
 	
+	@Disabled
 	@Test
 	void updateBoardTest() {
 		Long boardId = 12L;
@@ -77,6 +78,13 @@ public class BoardServiceTest {
 		
 		boardService.updateBoard(boardVo);
 		System.out.println(boardService.getBoard(boardId));
+	}
+	
+	@Test
+	void deleteBaordTest() {
+		Long boardId = 30L;
+		System.out.println("delete: " + boardService.deleteBoard(boardId));
+		System.out.println("select: " + boardService.getBoard(boardId));
 	}
 	
 }

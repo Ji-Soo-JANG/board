@@ -56,6 +56,7 @@ public class BoardMapperTest {
 		System.out.println("isOwner: " + isOwner);
 	}
 	
+	@Disabled
 	@Test
 	void updateBoardTest() {
 		Long boardId = 12L;
@@ -70,4 +71,10 @@ public class BoardMapperTest {
 		boardMapper.updateBoard(boardVo);
 		System.out.println(boardMapper.selectBoard(boardId));
 	}
+	
+	@Test
+	void deleteBoardTest() {
+		Long boardId = 42L;
+		System.out.println("result: " + boardMapper.deleteBoard(boardId));
+		System.out.println("selectBoard: " + boardMapper.selectBoard(boardId));	}
 }

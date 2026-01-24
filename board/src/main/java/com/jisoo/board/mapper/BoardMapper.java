@@ -12,4 +12,5 @@ public interface BoardMapper {
 	public List<BoardVo> selectAllBoards();
 	public BoardVo selectBoard(Long boardId);
 	public int isOwner(Long boardId, Long userId);
+	public int updateBoard(BoardVo boardVo);
 }

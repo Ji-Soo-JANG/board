@@ -12,4 +12,5 @@ public interface BoardService {
 	public List<BoardVo> getAllBoards();
 	public BoardVo getBoard(Long boardId);
 	public boolean isOwner(Long boardId, Long userId);
+	public boolean updateBoard(BoardVo boardVo);
 }

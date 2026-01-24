@@ -149,7 +149,6 @@ public class MainController {
     	boardVo.setWriterId(user.getUserId());
     	boardVo.setWriterName(user.getUsername());
     	boardService.registerBoard(boardVo);
-    	
         return "redirect:/board";
     }
     
@@ -169,7 +168,34 @@ public class MainController {
     public String boardEdit(@PathVariable("boardId") Long boardId,
     		@AuthenticationPrincipal SecurityUser securityUser, Model model) {
     	
-    	
-    	return null;
+    	if(securityUser == null || !boardService.isOwner(boardId, securityUser.getUserId())) {
+            return "redirect:/board/" + boardId;
+        }
+
+        BoardVo board = boardService.getBoard(boardId);
+
+        model.addAttribute("board", board);
+        model.addAttribute("mode", "edit");
+
+        return "views/boardWrite";
     }
+ 
+    @PostMapping("/board/update/{boardId}")
+    public String updateBoard(@PathVariable("boardId") Long boardId,
+    		@ModelAttribute BoardVo boardVo,
+    		@AuthenticationPrincipal SecurityUser securityUser,
+    		Model model) {
+//    	System.out.println("updateBoard: /board/update/" + boardId);
+//    	System.out.println("updateBoard: boardVo" + boardVo);
+//    	System.out.println("isOwner: " + boardService.isOwner(boardId, securityUser.getUserId()));
+    	
+    	if(securityUser == null || !boardService.isOwner(boardId, securityUser.getUserId())) {
+    		return "redirect:/board";
+    	}
+    	boardVo.setBoardId(boardId);
+    	boardService.updateBoard(boardVo);
+    	
+    	return "redirect:/board/" + boardId;
+    }
+    
 }

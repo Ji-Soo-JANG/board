@@ -55,13 +55,28 @@ public class BoardServiceTest {
 		System.out.println("boardVo: " + boardVo);
 	}
 
-	
+	@Disabled
 	@Test
 	void isOwnerTest() {
 		Long boardId = 12L;
 		Long userId = 20L;
 		boolean isOwner = boardService.isOwner(boardId, userId);
 		System.out.println("isOwner: " + isOwner);
+	}
+	
+	@Test
+	void updateBoardTest() {
+		Long boardId = 12L;
+		String title = "serviceUpdateBoardTest";
+		String content = "serviceUpdateBoardTestContent";
+		
+		BoardVo boardVo = new BoardVo();
+		boardVo.setBoardId(boardId);
+		boardVo.setTitle(title);
+		boardVo.setContent(content);
+		
+		boardService.updateBoard(boardVo);
+		System.out.println(boardService.getBoard(boardId));
 	}
 	
 }

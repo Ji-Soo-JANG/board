@@ -47,11 +47,27 @@ public class BoardMapperTest {
 		System.out.println("boardVo: " + boardVo);
 	}
 	
+	@Disabled
 	@Test
 	void isOwnerTest() {
 		Long boardId = 12L;
 		Long userId = 20L;
 		int isOwner = boardMapper.isOwner(boardId, userId);
 		System.out.println("isOwner: " + isOwner);
+	}
+	
+	@Test
+	void updateBoardTest() {
+		Long boardId = 12L;
+		String title = "updateBoardTest";
+		String content = "updateBoardTestContent";
+		
+		BoardVo boardVo = new BoardVo();
+		boardVo.setBoardId(boardId);
+		boardVo.setTitle(title);
+		boardVo.setContent(content);
+		
+		boardMapper.updateBoard(boardVo);
+		System.out.println(boardMapper.selectBoard(boardId));
 	}
 }

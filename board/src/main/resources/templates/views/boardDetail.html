@@ -9,22 +9,19 @@
 
 <body class="bg-light">
 	<!-- Header -->
-		<header class="border-bottom py-3 bg-light">
-			<div class="container d-flex align-items-center">
-				<h2 class="mb-0">LOGO</h2>
-				<a class="btn btn-outline-secondary ms-auto" th:href="@{/}">ホームへ</a>
-			</div>
-		</header>
+	<header class="border-bottom py-3 bg-light">
+		<div class="container d-flex align-items-center">
+			<h2 class="mb-0">LOGO</h2>
+			<a class="btn btn-outline-secondary ms-auto" th:href="@{/}">ホームへ</a>
+		</div>
+	</header>
 
-	<!-- main -->
 	<main class="container py-4">
 
-		<!-- タイトル -->
 		<div class="d-flex align-items-end justify-content-between mb-3">
 			<div>
 				<h3 class="mb-0">投稿詳細</h3>
 			</div>
-
 		</div>
 
 		<div class="card shadow-sm">
@@ -43,26 +40,23 @@
 					</div>
 				</div>
 
-				<!-- タイトル -->
 				<div class="mb-3">
 					<label class="form-label">タイトル</label>
 					<input type="text" class="form-control" th:value="${board.title}" readonly>
 				</div>
 
-				<!-- 内容 -->
 				<div class="mb-4">
 					<label class="form-label">内容</label>
 					<div class="form-control bg-white" style="min-height: 260px;" th:utext="${board.content}"></div>
 				</div>
 
 				<!-- ボタン -->
-				<div class="d-flex justify-content-between">
+				<div class="d-flex justify-content-between align-items-center">
 					<a class="btn btn-outline-secondary" th:href="@{/board}">一覧へ</a>
 
 					<div class="d-flex gap-2" th:if="${isOwner}">
-						<!-- TODO: 삭제 권한(작성자) -->
 						<a class="btn btn-primary" th:href="@{/board/edit/{id}(id=${board.boardId})}">編集</a>
-						<!-- TODO: 삭제 권한(작성자) -->
+
 						<form th:action="@{/board/delete/{id}(id=${board.boardId})}" method="post" class="m-0">
 							<button type="submit" class="btn btn-danger"
 								onclick="return confirm('削除しますか？');">削除</button>
@@ -76,10 +70,8 @@
 		<div class="my-4"></div>
 	</main>
 
-	<!-- Footer -->
 	<footer class="border-top py-3 text-center text-muted">
 	</footer>
-
 </body>
 
 </html>

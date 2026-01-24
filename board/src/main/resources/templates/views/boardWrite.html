@@ -21,13 +21,15 @@
 		<div class="d-flex align-items-end justify-content-between mb-3">
 			<div>
 				<h3 class="mb-0">新規投稿</h3>
-				<small class="text-muted">タイトルと内容を入力してください</small>
 			</div>
 		</div>
 
 		<div class="card shadow-sm">
 			<div class="card-body">
-				<form method="post" th:action="@{/board/write}" th:object="${board}">
+				<form method="post" th:action="${mode == 'edit'}
+				 ? @{/board/update/{boardId}(boardId=*{boardId})}
+				  : @{/board/write}" th:object="${board}">
+				  
 					<div class="mb-3">
 						<label class="form-label">タイトル</label>
 						<input type="text" class="form-control" th:field="*{title}" placeholder="タイトルを入力してください。"
@@ -38,12 +40,13 @@
 						<label class="form-label">内容</label>
 						<textarea id="editor" class="form-control" th:field="*{content}" rows="10"
 							placeholder="本文を入力してください">
-			</textarea>
+						</textarea>
 					</div>
 
 					<div class="d-flex justify-content-end gap-2">
 						<a class="btn btn-outline-secondary" th:href="@{/board}">キャンセル</a>
-						<button type="submit" class="btn btn-primary">投稿する</button>
+						<button type="submit" class="btn btn-primary"
+						        th:text="${mode == 'edit'} ? '保存する' : '投稿する'"></button>
 					</div>
 				</form>
 			</div>

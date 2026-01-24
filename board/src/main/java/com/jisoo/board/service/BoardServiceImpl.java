@@ -27,7 +27,7 @@ public class BoardServiceImpl implements BoardService{
 	@Override
 	public List<BoardVo> getAllBoards() {
 		List<BoardVo> list = boardMapper.selectAllBoards();
-		System.out.println(list);
+//		System.out.println(list);
 		return list;
 	}
 
@@ -41,6 +41,15 @@ public class BoardServiceImpl implements BoardService{
 	public boolean isOwner(Long boardId, Long userId) {
 		int isOwner = boardMapper.isOwner(boardId, userId);
 		return isOwner > 0;
+	}
+
+	@Override
+	public boolean updateBoard(BoardVo boardVo) {
+		int update = boardMapper.updateBoard(boardVo);
+		if(update == 1) {
+			return true;
+		}
+		return false;
 	}
 	
 	

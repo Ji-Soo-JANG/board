@@ -36,6 +36,7 @@ public class BoardServiceTest {
 		System.out.println("register: " + register);
 	}
 	
+	@Disabled
 	@Test
 	void getAllBoardsTest() {
 		List<BoardVo> list = boardService.getAllBoards();
@@ -44,6 +45,23 @@ public class BoardServiceTest {
 		    System.out.printf("[%d] %s (%s)%n",
 		        b.getBoardId(), b.getTitle(), b.getWriterName())
 		);
+	}
+	
+	@Disabled
+	@Test
+	void getBoardTest() {
+		Long boardId = 30L;
+		BoardVo boardVo = boardService.getBoard(boardId);
+		System.out.println("boardVo: " + boardVo);
+	}
+
+	
+	@Test
+	void isOwnerTest() {
+		Long boardId = 12L;
+		Long userId = 20L;
+		boolean isOwner = boardService.isOwner(boardId, userId);
+		System.out.println("isOwner: " + isOwner);
 	}
 	
 }

@@ -32,9 +32,26 @@ public class BoardMapperTest {
 		System.out.println("result: " + result);
 	}
 	
+	@Disabled
 	@Test
 	void findAllTest() {
 		List<BoardVo> list = boardMapper.selectAllBoards();
 		System.out.println(list);
+	}
+	
+	@Disabled
+	@Test
+	void selectBoardTest() {
+		Long boardId = 30L;
+		BoardVo boardVo = boardMapper.selectBoard(boardId);
+		System.out.println("boardVo: " + boardVo);
+	}
+	
+	@Test
+	void isOwnerTest() {
+		Long boardId = 12L;
+		Long userId = 20L;
+		int isOwner = boardMapper.isOwner(boardId, userId);
+		System.out.println("isOwner: " + isOwner);
 	}
 }

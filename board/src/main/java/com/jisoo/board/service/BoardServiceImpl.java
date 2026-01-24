@@ -31,4 +31,17 @@ public class BoardServiceImpl implements BoardService{
 		return list;
 	}
 
+	@Override
+	public BoardVo getBoard(Long boardId) {
+		BoardVo boardVo = boardMapper.selectBoard(boardId);
+		return boardVo;
+	}
+
+	@Override
+	public boolean isOwner(Long boardId, Long userId) {
+		int isOwner = boardMapper.isOwner(boardId, userId);
+		return isOwner > 0;
+	}
+	
+	
 }

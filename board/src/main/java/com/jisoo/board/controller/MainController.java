@@ -8,6 +8,8 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -135,5 +137,39 @@ public class MainController {
         return "views/boardList";
     }
     
+    // 수정이나 상세보기에서도 같은 폼을 이용하기 위해(th:field) 빈 BoardVo를 전달 
+    @GetMapping("/board/write")
+    public String boardWrite(Model model) {
+    	model.addAttribute("board", new BoardVo());
+        return "views/boardWrite";
+    }
     
+    @PostMapping("/board/write")
+    public String write(@ModelAttribute BoardVo boardVo, @AuthenticationPrincipal SecurityUser user, Model model) {
+    	boardVo.setWriterId(user.getUserId());
+    	boardVo.setWriterName(user.getUsername());
+    	boardService.registerBoard(boardVo);
+    	
+        return "redirect:/board";
+    }
+    
+    @GetMapping("/board/{boardId}")
+    public String boardDetail(@PathVariable("boardId") Long boardId,
+    		@AuthenticationPrincipal SecurityUser securityUser, Model model) {
+    	BoardVo boardVo = boardService.getBoard(boardId);
+    	boolean isOwner = (securityUser != null) && boardService.isOwner(boardId, securityUser.getUserId());
+    	
+    	model.addAttribute("board", boardVo);
+    	model.addAttribute("isOwner", isOwner);
+    	
+    	return "views/boardDetail";
+    }
+    
+    @GetMapping("/board/edit/{boardId}")
+    public String boardEdit(@PathVariable("boardId") Long boardId,
+    		@AuthenticationPrincipal SecurityUser securityUser, Model model) {
+    	
+    	
+    	return null;
+    }
 }

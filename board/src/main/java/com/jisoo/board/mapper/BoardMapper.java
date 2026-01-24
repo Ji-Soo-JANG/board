@@ -10,4 +10,6 @@ import com.jisoo.board.domain.BoardVo;
 public interface BoardMapper {
 	public int insertBoard(BoardVo boardVo);
 	public List<BoardVo> selectAllBoards();
+	public BoardVo selectBoard(Long boardId);
+	public int isOwner(Long boardId, Long userId);
 }

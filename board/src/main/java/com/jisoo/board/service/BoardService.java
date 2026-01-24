@@ -14,4 +14,11 @@ public interface BoardService {
 	public boolean isOwner(Long boardId, Long userId);
 	public boolean updateBoard(BoardVo boardVo);
 	public boolean deleteBoard(Long boardId);
+	public boolean increaseViewCount(Long boardId);
+	public boolean increaseLikeCount(Long boardId);
+	public boolean decreaseLikeCount(Long boardId);
+	public boolean insertBoardLike(Long boardId, Long userId);
+	public boolean deleteBoardLike(Long boardId, Long userId);
+	int toggleLike(Long boardId, Long userId);
+
 }

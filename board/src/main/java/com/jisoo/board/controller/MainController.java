@@ -158,6 +158,8 @@ public class MainController {
     public String boardDetail(@PathVariable("boardId") Long boardId,
     		@AuthenticationPrincipal SecurityUser securityUser, Model model) {
     	BoardVo boardVo = boardService.getBoard(boardId);
+    	System.out.println(boardVo);
+    	boardService.increaseViewCount(boardId);
     	boolean isOwner = (securityUser != null) && boardService.isOwner(boardId, securityUser.getUserId());
     	
     	model.addAttribute("board", boardVo);
@@ -213,4 +215,11 @@ public class MainController {
 		return "redirect:/board";
     }
     
+    @PostMapping("/board/{boardId}/like")
+    @ResponseBody
+    public int like(@PathVariable("boardId") Long boardId,
+                    @AuthenticationPrincipal SecurityUser user) {
+//    	System.out.println("controller - like");
+        return boardService.toggleLike(boardId, user.getUserId());
+    }
 }

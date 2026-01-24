@@ -25,9 +25,10 @@
   	<select id="isOwner">
   		SELECT COUNT(*)
   		FROM TBL_BOARD
-  		WHERE WRITER_ID = #{userId}
-  		AND
-  		BOARD_ID = #{boardId}
+  		WHERE
+  			WRITER_ID = #{userId}
+  			AND
+  			BOARD_ID = #{boardId}
   	</select>
   	
   	<update id="updateBoard" parameterType="com.jisoo.board.domain.BoardVo">
@@ -45,4 +46,38 @@
   			DELETED_AT = SYSDATE
   		WHERE BOARD_ID = #{boardId}
   	</update>
+  	
+  	<update id="increaseViewCount">
+  		UPDATE TBL_BOARD
+  		SET
+  			VIEW_COUNT = VIEW_COUNT + 1
+  		WHERE BOARD_ID = #{boardId}
+  	</update>
+  	
+  	<update id="increaseLikeCount">
+  		UPDATE TBL_BOARD
+  		SET
+  			LIKE_COUNT = LIKE_COUNT + 1
+  		WHERE BOARD_ID = #{boardId}
+  	</update>
+  	
+  	<update id="decreaseLikeCount">
+  		UPDATE TBL_BOARD
+  		SET
+  			LIKE_COUNT = LIKE_COUNT - 1
+  		WHERE BOARD_ID = #{boardId}
+  	</update>
+  	
+  	<insert id="insertBoardLike">
+  		INSERT INTO TBL_BOARD_LIKE (board_id, user_id, created_at)
+		VALUES(#{boardId}, #{userId}, SYSDATE)
+  	</insert>
+
+	<delete id="deleteBoardLike">
+		DELETE FROM TBL_BOARD_LIKE
+		WHERE
+			BOARD_ID = #{boardId}
+			AND
+			USER_ID = #{userId}
+	</delete>  	
   </mapper>

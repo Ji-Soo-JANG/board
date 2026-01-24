@@ -18,10 +18,13 @@
 
 	<main class="container py-4">
 
-		<div class="d-flex align-items-end justify-content-between mb-3">
-			<div>
-				<h3 class="mb-0">投稿詳細</h3>
-			</div>
+		<div class="d-flex align-items-center justify-content-between">
+		  <h3 class="mb-0">投稿詳細</h3>
+
+		  <div class="d-flex align-items-center gap-2">
+		    <button class="btn btn-outline-danger btn-sm" th:attr="data-board-id=${board.boardId}" id="btnLike">❤️</button>
+		    <span id="likeCount" th:text="${board.likeCount}">0</span>
+		  </div>
 		</div>
 
 		<div class="card shadow-sm">
@@ -72,6 +75,22 @@
 
 	<footer class="border-top py-3 text-center text-muted">
 	</footer>
+	
+	<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+	<script>
+		 
+		$(function(){
+			$("#btnLike").on("click", function(){
+				var boardId = $(this).data("board-id");
+				console.log("boardId: " + boardId);
+				$.post(`/board/${boardId}/like`, function(result){
+					var count = Number($("#likeCount").text());
+					$("#likeCount").text(count+result);
+				})
+			});
+		});
+	</script>
+	
 </body>
 
 </html>

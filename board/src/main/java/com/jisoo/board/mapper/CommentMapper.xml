@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+  <mapper namespace="com.jisoo.board.mapper.CommentMapper">
+  	<insert id="insertComment" parameterType="com.jisoo.board.domain.CommentVo">
+  		INSERT INTO TBL_COMMENT(BOARD_ID, WRITER_ID, CONTENT)
+  		VALUES(#{boardId}, #{writerId}, #{content})
+  	</insert>
+  	
+  	<select id="selectComments" resultType="com.jisoo.board.domain.CommentVo">
+  		SELECT *
+  		FROM TBL_COMMENT
+  		WHERE 
+  			BOARD_ID = #{boardId}
+	  		AND
+  			DELETED_AT IS NULL	
+  	</select>
+  	
+  	<update id="updateComment" parameterType="com.jisoo.board.domain.CommentVo">
+  		UPDATE TBL_COMMENT
+  		SET
+  			CONTENT = #{content},
+  			UPDATED_AT = SYSDATE
+  		WHERE
+  			COMMENT_ID = #{commentId}
+  	</update>
+  	
+  	<update id="deleteComment">
+  		UPDATE TBL_COMMENT
+  		SET
+  			DELETED_AT = SYSDATE
+  		WHERE
+  			COMMENT_ID = #{commentId}
+  	</update>
+  	
+  	<select id="isOwner">
+  		SELECT COUNT(*)
+  		FROM TBL_COMMENT
+  		WHERE
+  			WRITER_ID = #{userId}
+  			AND
+  			COMMENT_ID = #{commentId}
+  	</select>
+ </mapper>

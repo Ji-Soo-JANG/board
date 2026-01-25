@@ -15,13 +15,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.jisoo.board.domain.BoardVo;
+import com.jisoo.board.domain.CommentVo;
 import com.jisoo.board.domain.MyPageDto;
 import com.jisoo.board.domain.UserSignupDto;
 import com.jisoo.board.domain.UserVo;
 import com.jisoo.board.security.SecurityUser;
 import com.jisoo.board.service.BoardService;
+import com.jisoo.board.service.CommentService;
 import com.jisoo.board.service.UserService;
-import org.springframework.web.bind.annotation.RequestBody;
 
 
 @Controller
@@ -29,10 +30,12 @@ public class MainController {
 
 	private final UserService userService;
 	private final BoardService boardService;
+	private final CommentService commentService;
 	
-	public MainController(UserService userService, BoardService boardService) {
+	public MainController(UserService userService, BoardService boardService, CommentService commentService) {
 		this.userService = userService;
 		this.boardService = boardService;
+		this.commentService = commentService;
 	}
 	
 	
@@ -158,12 +161,15 @@ public class MainController {
     public String boardDetail(@PathVariable("boardId") Long boardId,
     		@AuthenticationPrincipal SecurityUser securityUser, Model model) {
     	BoardVo boardVo = boardService.getBoard(boardId);
-    	System.out.println(boardVo);
     	boardService.increaseViewCount(boardId);
     	boolean isOwner = (securityUser != null) && boardService.isOwner(boardId, securityUser.getUserId());
     	
+    	List<CommentVo> comment = commentService.getComments(boardId);
+    	
+    	model.addAttribute("loginId", securityUser != null ? securityUser.getUserId() : null);
     	model.addAttribute("board", boardVo);
     	model.addAttribute("isOwner", isOwner);
+    	model.addAttribute("comment", comment);
     	
     	return "views/boardDetail";
     }
@@ -222,4 +228,45 @@ public class MainController {
 //    	System.out.println("controller - like");
         return boardService.toggleLike(boardId, user.getUserId());
     }
+    
+    @PostMapping("/board/{boardId}/comment")
+    public String writeComment(@PathVariable("boardId") Long boardId,
+    		@AuthenticationPrincipal SecurityUser securityUser,
+    		@ModelAttribute CommentVo commentVo) {
+    	commentVo.setWriterId(securityUser.getUserId());
+//    	System.out.println("ctr - commentVo: " + commentVo);
+    	
+    	commentService.insertComment(commentVo);
+    	return "redirect:/board/" + boardId;
+    }
+    
+    @PostMapping("/board/{boardId}/comment/{commentId}/update")
+    @ResponseBody
+    public Map<String, Boolean> updateComment(@PathVariable Long boardId,
+    		@PathVariable Long commentId,
+            @AuthenticationPrincipal SecurityUser securityUser,
+            @ModelAttribute CommentVo commentVo) {
+    	
+    	boolean update = false;
+    	
+    	if(securityUser != null && commentService.isOwner(commentId, securityUser.getUserId())) {
+    		update = commentService.updateComment(commentVo);
+    	}
+    	Map<String, Boolean> result = new HashMap<>();
+    	result.put("update", update);
+        return result;
+    }
+    
+    @PostMapping("/board/{boardId}/comment/{commentId}/delete")
+    public String postMethodName(@PathVariable Long boardId,
+    		@PathVariable Long commentId,
+    		@AuthenticationPrincipal SecurityUser securityUser) {
+
+    	if(securityUser != null && commentService.isOwner(commentId, securityUser.getUserId())) {
+    		commentService.delteComment(commentId);
+    	}
+    	
+        return "redirect:/board/" + boardId;
+    }
+    
 }

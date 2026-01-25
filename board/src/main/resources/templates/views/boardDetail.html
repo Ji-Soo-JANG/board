@@ -7,7 +7,7 @@
 	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 
-<body class="bg-light">
+<body class="bg-light" th:attr="data-board-id=${board.boardId}">
 	<!-- Header -->
 	<header class="border-bottom py-3 bg-light">
 		<div class="container d-flex align-items-center">
@@ -19,12 +19,13 @@
 	<main class="container py-4">
 
 		<div class="d-flex align-items-center justify-content-between">
-		  <h3 class="mb-0">投稿詳細</h3>
+			<h3 class="mb-0">投稿詳細</h3>
 
-		  <div class="d-flex align-items-center gap-2">
-		    <button class="btn btn-outline-danger btn-sm" th:attr="data-board-id=${board.boardId}" id="btnLike">❤️</button>
-		    <span id="likeCount" th:text="${board.likeCount}">0</span>
-		  </div>
+			<div class="d-flex align-items-center gap-2">
+				<button class="btn btn-outline-danger btn-sm" th:attr="data-board-id=${board.boardId}"
+					id="btnLike">❤️</button>
+				<span id="likeCount" th:text="${board.likeCount}">0</span>
+			</div>
 		</div>
 
 		<div class="card shadow-sm">
@@ -71,26 +72,139 @@
 		</div>
 
 		<div class="my-4"></div>
+
+		<!-- コメント -->
+		<div class="card shadow-sm mb-3">
+			<div class="card-body">
+				<form method="post" th:action="@{/board/{boardId}/comment(boardId=${board.boardId})}">
+					<div class="mb-2">
+						<label class="form-label">コメントを書く</label>
+						<textarea class="form-control" name="content" rows="3" maxlength="500"
+							placeholder="コメントを入力してください" required></textarea>
+					</div>
+					<div class="d-flex justify-content-end">
+						<button type="submit" class="btn btn-primary btn-sm">投稿</button>
+					</div>
+				</form>
+			</div>
+		</div>
+
+		<!-- コメント一覧 -->
+		<div class="list-group">
+			<div class="list-group-item" th:each="c : ${comment}">
+				<div id="divComment" class="d-flex justify-content-between align-items-start">
+					<div class="me-3 w-100">
+						<div class="d-flex align-items-center gap-2">
+							<strong th:text="${c.writerId}">ユーザー</strong>
+							<small class="text-muted"
+								th:text="${#temporals.format(c.createdAt, 'yyyy/MM/dd HH:mm')}">2026/01/25 10:00</small>
+						</div>
+
+						<div class="comment-item">
+							<p class="mb-2 mt-2 comment-view" th:text="${c.content}">コメント内容</p>
+
+							<!-- 作成者のみ -->
+							<div th:if="${loginId != null and loginId == c.writerId}"
+								th:attr="data-comment-id=${c.commentId}" class="comment-owner">
+
+								<div class="d-flex gap-2">
+									<button type="button"
+										class="btn btn-outline-primary btn-sm btnUpdateToggle">修正</button>
+									<form
+										th:action="@{/board/{boardId}/comment/{commentId}/delete(boardId=${board.boardId}, commentId=${c.commentId})}"
+										method="post" class="m-0 formDeleteComment">
+										<button type="submit" class="btn btn-outline-danger btn-sm"
+											onclick="return confirm('削除しますか？');">削除</button>
+									</form>
+
+									<textarea class="form-control mt-2 taComment d-none" rows="3" maxlength="500"
+										th:text="${c.content}"></textarea>
+
+									<div class="d-flex justify-content-end gap-2 mt-2 editButtons d-none">
+										<button type="button"
+											class="btn btn-outline-secondary btn-sm btnCancle">キャンセル</button>
+										<button type="button" class="btn btn-success btn-sm btnUpdate">保存</button>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
 	</main>
 
 	<footer class="border-top py-3 text-center text-muted">
 	</footer>
-	
+
+	<!-- script -->
 	<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 	<script>
-		 
-		$(function(){
-			$("#btnLike").on("click", function(){
+
+		$(function () {
+			$("#btnLike").on("click", function () {
 				var boardId = $(this).data("board-id");
 				console.log("boardId: " + boardId);
-				$.post(`/board/${boardId}/like`, function(result){
+				$.post(`/board/${boardId}/like`, function (result) {
 					var count = Number($("#likeCount").text());
-					$("#likeCount").text(count+result);
+					$("#likeCount").text(count + result);
 				})
+			});
+
+			$(".btnUpdateToggle").on("click", function () {
+				const $wrap = $(this).closest(".comment-owner");
+				const $item = $(this).closest(".comment-item");
+
+				$item.find(".comment-view").addClass("d-none");
+				$wrap.find(".taComment").removeClass("d-none");
+				$wrap.find(".editButtons").removeClass("d-none");
+				$wrap.find(".btnUpdateToggle").addClass("d-none");
+				$wrap.find(".formDeleteComment").addClass("d-none");
+			});
+
+			$(".btnCancle").on("click", function () {
+				const $wrap = $(this).closest(".comment-owner");
+				const $item = $(this).closest(".comment-item");
+
+				$item.find(".comment-view").removeClass("d-none");
+				$wrap.find(".taComment").addClass("d-none");
+				$wrap.find(".editButtons").addClass("d-none");
+				$wrap.find(".btnUpdateToggle").removeClass("d-none");
+				$wrap.find(".formDeleteComment").removeClass("d-none");
+
+			});
+
+			$(".btnUpdate").on("click", function () {
+				const $wrap = $(this).closest(".comment-owner");
+				const commentId = $wrap.data("comment-id");
+				const boardId = $("body").data("board-id");
+				const content = $wrap.find(".taComment").val();
+
+				$.post(`/board/${boardId}/comment/${commentId}/update`, {content: content})
+					.done(function (result) {
+
+						if (result.update) {
+							const $item = $wrap.closest(".comment-item");
+							$item.find(".comment-view").text(content).removeClass("d-none");
+							$wrap.find(".taComment").addClass("d-none");
+							$wrap.find(".editButtons").addClass("d-none");
+							$wrap.find(".formDeleteComment").removeClass("d-none");
+							$wrap.find(".btnUpdateToggle").removeClass("d-none");
+
+							alert("成功");
+						} else {
+							alert("失敗");
+						}
+					})
+
+					.fail(function (xhr) {
+						alert("更新に失敗しました。");
+					});
 			});
 		});
 	</script>
-	
+
 </body>
 
 </html>

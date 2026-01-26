@@ -136,9 +136,24 @@ public class MainController {
     }
     
     @GetMapping("/board")
-    public String boards(Model model) {
-    	List<BoardVo> list = boardService.getAllBoards();
+    public String boards(@RequestParam(value = "page", defaultValue = "1") int page, 
+    		Model model) {
+    	int pages = boardService.getPageCount();
+    	int size = 10;
+    	int pageSize = 10;
+    	int start = size * (page - 1) + 1;
+    	int end = page * size;
+    	int startPage = pageSize *( (page - 1) / pageSize ) + 1;
+    	int endPage = Math.min(startPage + pageSize - 1, pages);
+    	
+    	List<BoardVo> list = boardService.getboards(start, end);
+    	
+    	model.addAttribute("currentPage", page);
+    	model.addAttribute("startPage", startPage);
+    	model.addAttribute("endPage", endPage);
+    	model.addAttribute("pages", pages);
     	model.addAttribute("list", list);
+    	
         return "views/boardList";
     }
     

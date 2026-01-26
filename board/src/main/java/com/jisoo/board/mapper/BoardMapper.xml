@@ -12,8 +12,27 @@
   	<select id="selectAllBoards" resultType="com.jisoo.board.domain.BoardVo">
   		SELECT *
   		FROM TBL_BOARD
-  		WHERE deleted_at IS NULL
+  		WHERE DELETED_AT IS NULL
   		ORDER BY board_id DESC
+  	</select>
+  	
+  	<select id="selectBoardsPage" resultType="com.jisoo.board.domain.BoardVo">
+  		SELECT * 
+  		FROM(
+	  		SELECT B.*, ROWNUM rn 
+	  		FROM(
+				SELECT * FROM TBL_BOARD
+	  			WHERE DELETED_AT IS NULL
+	  			ORDER BY BOARD_ID DESC
+	  			) B
+  			)
+  		WHERE rn BETWEEN #{start} AND #{end}
+  	</select>
+  	
+  	<select id="getCount">
+  		SELECT count(*)
+  		FROM TBL_BOARD
+  		WHERE DELETED_AT IS NULL
   	</select>
   	
   	<select id="selectBoard" resultType="com.jisoo.board.domain.BoardVo">

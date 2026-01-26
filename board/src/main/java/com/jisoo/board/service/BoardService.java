@@ -10,6 +10,8 @@ import com.jisoo.board.domain.BoardVo;
 public interface BoardService {
 	public boolean registerBoard(BoardVo boardVo);
 	public List<BoardVo> getAllBoards();
+	public List<BoardVo> getboards(int start, int end);
+	public int getPageCount();
 	public BoardVo getBoard(Long boardId);
 	public boolean isOwner(Long boardId, Long userId);
 	public boolean updateBoard(BoardVo boardVo);

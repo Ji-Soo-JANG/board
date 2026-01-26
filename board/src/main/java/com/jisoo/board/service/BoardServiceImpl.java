@@ -127,6 +127,23 @@ public class BoardServiceImpl implements BoardService{
 		
 		return 0;
 	}
+
+	@Override
+	public List<BoardVo> getboards(int start, int end) {
+		List<BoardVo> list = boardMapper.selectBoardsPage(start, end);
+		return list;
+	}
+
+	@Override
+	public int getPageCount() {
+		int count = boardMapper.getCount();
+		int page = count / 10;
+		if(count % 10 != 0) {
+			page += 1;
+		}
+		
+		return page;
+	}
 	
 	
 }

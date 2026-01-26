@@ -10,6 +10,8 @@ import com.jisoo.board.domain.BoardVo;
 public interface BoardMapper {
 	public int insertBoard(BoardVo boardVo);
 	public List<BoardVo> selectAllBoards();
+	public List<BoardVo> selectBoardsPage(int start, int end); 
+	public int getCount();
 	public BoardVo selectBoard(Long boardId);
 	public int isOwner(Long boardId, Long userId);
 	public int updateBoard(BoardVo boardVo);

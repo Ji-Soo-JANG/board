@@ -72,9 +72,21 @@ public class BoardMapperTest {
 		System.out.println(boardMapper.selectBoard(boardId));
 	}
 	
+	@Disabled
 	@Test
 	void deleteBoardTest() {
 		Long boardId = 42L;
 		System.out.println("result: " + boardMapper.deleteBoard(boardId));
-		System.out.println("selectBoard: " + boardMapper.selectBoard(boardId));	}
+		System.out.println("selectBoard: " + boardMapper.selectBoard(boardId));	
+	}
+
+	/*
+	 * @Test void selectBoardsByKeword() { // String searchType = "title"; // String
+	 * searchType = "content"; String searchType = "writerName"; String keyword =
+	 * "e";
+	 * 
+	 * List<BoardVo> list = boardMapper.selectBoardsByKeword(searchType, keyword);
+	 * System.out.println("result: " + list); }
+	 */
+	
 }

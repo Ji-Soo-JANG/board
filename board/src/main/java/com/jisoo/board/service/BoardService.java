@@ -5,13 +5,15 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import com.jisoo.board.domain.BoardVo;
+import com.jisoo.board.domain.PageDto;
 
 @Service
 public interface BoardService {
 	public boolean registerBoard(BoardVo boardVo);
 	public List<BoardVo> getAllBoards();
 	public List<BoardVo> getboards(int start, int end);
-	public int getPageCount();
+	public List<BoardVo >selectBoardsByKeword(PageDto pageDto);
+	public int getPageCount(PageDto pageDto);
 	public BoardVo getBoard(Long boardId);
 	public boolean isOwner(Long boardId, Long userId);
 	public boolean updateBoard(BoardVo boardVo);

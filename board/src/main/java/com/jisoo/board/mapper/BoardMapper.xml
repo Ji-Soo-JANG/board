@@ -29,16 +29,77 @@
   		WHERE rn BETWEEN #{start} AND #{end}
   	</select>
   	
-  	<select id="getCount">
-  		SELECT count(*)
-  		FROM TBL_BOARD
-  		WHERE DELETED_AT IS NULL
-  	</select>
+  	<select id="getCount" parameterType="com.jisoo.board.domain.PageDto">
+  		SELECT COUNT(*)
+		FROM TBL_BOARD
+		<where>
+			DELETED_AT IS NULL
+		
+		    <if test="keyword != null and keyword != ''">
+		      <choose>
+		        <when test="searchType == 'title'">
+		          AND TITLE LIKE '%' || #{keyword} || '%'
+		        </when>
+		
+		        <when test="searchType == 'content'">
+		          AND CONTENT LIKE '%' || #{keyword} || '%'
+		        </when>
+		
+		        <when test="searchType == 'writerName'">
+		          AND WRITER_NAME LIKE '%' || #{keyword} || '%'
+		        </when>
+		
+		        <otherwise>
+		          AND TITLE LIKE '%' || #{keyword} || '%'
+		        </otherwise>
+		      </choose>
+		    </if>
+		
+		  </where>
+	</select>
   	
   	<select id="selectBoard" resultType="com.jisoo.board.domain.BoardVo">
   		SELECT *
   		FROM TBL_BOARD
   		WHERE BOARD_ID = #{boardId}
+  	</select>
+  	
+  	<select id="selectBoardsByKeword" resultType="com.jisoo.board.domain.BoardVo" parameterType="com.jisoo.board.domain.PageDto">
+  			SELECT * 
+  			FROM(
+	  			SELECT B.*, ROWNUM rn 
+	  			FROM(SELECT *
+		  			FROM TBL_BOARD
+		  			  <where>
+							DELETED_AT IS NULL
+						 <if test="keyword != null and keyword != ''">
+					 
+						  <choose>
+							<when test="searchType == 'title'">
+					         AND TITLE LIKE '%' || #{keyword} || '%'
+						    </when>
+		
+		 				    <when test="searchType == 'content'">
+						     AND CONTENT LIKE '%' || #{keyword} || '%'
+					   	    </when>
+		
+						    <when test="searchType == 'writerName'">
+							 AND WRITER_NAME LIKE '%' || #{keyword} || '%'
+					  	    </when>
+		
+						    <otherwise>
+							 AND TITLE LIKE '%' || #{keyword} || '%'
+					        </otherwise>
+					
+					      </choose>
+					    </if>	
+					  </where>
+						ORDER BY BOARD_ID DESC
+						) B
+						WHERE ROWNUM <![CDATA[<=]]> #{end}
+			  )
+	  		WHERE rn <![CDATA[>=]]>#{start}
+
   	</select>
   	
   	<select id="isOwner">

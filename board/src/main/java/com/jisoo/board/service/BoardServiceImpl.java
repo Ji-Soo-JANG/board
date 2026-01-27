@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.jisoo.board.domain.BoardVo;
+import com.jisoo.board.domain.PageDto;
 import com.jisoo.board.mapper.BoardMapper;
 
 @Service
@@ -135,14 +136,20 @@ public class BoardServiceImpl implements BoardService{
 	}
 
 	@Override
-	public int getPageCount() {
-		int count = boardMapper.getCount();
+	public int getPageCount(PageDto pageDto) {
+		int count = boardMapper.getCount(pageDto);
 		int page = count / 10;
 		if(count % 10 != 0) {
 			page += 1;
 		}
 		
 		return page;
+	}
+
+	@Override
+	public List<BoardVo> selectBoardsByKeword(PageDto pageDto) {
+		List<BoardVo> list = boardMapper.selectBoardsByKeword(pageDto);
+		return list;
 	}
 	
 	

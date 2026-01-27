@@ -40,7 +40,7 @@
 			<div class="card-body">
 				<form class="row g-2 align-items-center" method="get" action="/board">
 					<div class="col-12 col-md-3">
-						<select name="type" class="form-select">
+						<select name="searchType" class="form-select">
 							<option value="title">タイトル</option>
 							<option value="content">内容</option>
 							<option value="writer">作成者</option>
@@ -51,6 +51,7 @@
 					</div>
 					<div class="col-12 col-md-2 d-grid">
 						<button class="btn btn-outline-secondary" type="submit">検索</button>
+						<a class="btn btn-outline-secondary" th:href="@{/board(currentPage=1)}">条件解除</a>
 					</div>
 				</form>
 			</div>
@@ -106,28 +107,53 @@
 		</div>
 
 		<!-- Pagination -->
-		<nav class="mt-3" th:if="${pages > 0}">
-			<ul class="pagination justify-content-center mb-0">
-				<li class="page-item" th:classappend="${currentPage == 1} ? 'disabled'">
-					<a class="page-link" th:href="@{/board(startPage=1)}" tabindex="-1">&laquo;</a>
-				</li>
-				<li class="page-item" th:classappend="${currentPage == 1} ? 'disabled'">
-					<a class="page-link" th:href="@{/board(page=${(startPage - 1) < 10 ? 1 : (startPage - 1)})}">&lsaquo;</a>
-				</li>
-				
-				<li class="page-item" th:each="page : ${#numbers.sequence(startPage, endPage)}"
-					th:classappend="${page == currentPage} ? 'active'">
-					<a class="page-link" th:href="@{/board(page=${page})}" th:text="${page}"></a>
-				</li>
-				
-				<li class="page-item" th:classappend="${currentPage == pages} ? 'disabled'">
-					<a class="page-link" th:href="@{/board(page=${(endPage + 1) > pages ? pages : (endPage + 1)})}">&rsaquo;</a>
-				</li>
-				<li class="page-item" th:classappend="${currentPage == pages} ? 'disabled'">
-					<a class="page-link" th:href="@{/board(page=${pages})}">&raquo;</a>
-				</li>
-			</ul>
+		<nav class="mt-3" th:if="${pageDto.pages > 0}">
+		  <ul class="pagination justify-content-center mb-0">
+
+		    <li class="page-item" th:classappend="${pageDto.currentPage == 1} ? 'disabled'">
+		      <a class="page-link"
+		         th:href="@{/board(currentPage=1, searchType=${pageDto.searchType}, keyword=${pageDto.keyword})}"
+		         tabindex="-1">&laquo;</a>
+		    </li>
+
+		    <li class="page-item" th:classappend="${pageDto.startPage == 1} ? 'disabled'">
+		      <a class="page-link"
+		         th:href="@{/board(currentPage=${(pageDto.startPage - 1) < 1 ? 1 : (pageDto.startPage - 1)},
+		                           searchType=${pageDto.searchType},
+		                           keyword=${pageDto.keyword})}">
+		        &lsaquo;
+		      </a>
+		    </li>
+
+		    <li class="page-item"
+		        th:each="p : ${#numbers.sequence(pageDto.startPage, pageDto.endPage)}"
+		        th:classappend="${p == pageDto.currentPage} ? 'active'">
+		      <a class="page-link"
+		         th:href="@{/board(currentPage=${p}, searchType=${pageDto.searchType}, keyword=${pageDto.keyword})}"
+		         th:text="${p}">1</a>
+		    </li>
+
+		    <li class="page-item" th:classappend="${pageDto.endPage == pageDto.pages} ? 'disabled'">
+		      <a class="page-link"
+		         th:href="@{/board(currentPage=${(pageDto.endPage + 1) > pageDto.pages ? pageDto.pages : (pageDto.endPage + 1)},
+		                           searchType=${pageDto.searchType},
+		                           keyword=${pageDto.keyword})}">
+		        &rsaquo;
+		      </a>
+		    </li>
+
+		    <li class="page-item" th:classappend="${pageDto.currentPage == pageDto.pages} ? 'disabled'">
+		      <a class="page-link"
+		         th:href="@{/board(currentPage=${pageDto.pages}, searchType=${pageDto.searchType}, keyword=${pageDto.keyword})}">
+		        &raquo;
+		      </a>
+		    </li>
+
+		  </ul>
 		</nav>
+
+
+
 
 	</main>
 

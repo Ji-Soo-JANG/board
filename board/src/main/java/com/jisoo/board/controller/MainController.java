@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.jisoo.board.domain.BoardVo;
 import com.jisoo.board.domain.CommentVo;
 import com.jisoo.board.domain.MyPageDto;
+import com.jisoo.board.domain.PageDto;
 import com.jisoo.board.domain.UserSignupDto;
 import com.jisoo.board.domain.UserVo;
 import com.jisoo.board.security.SecurityUser;
@@ -136,22 +137,15 @@ public class MainController {
     }
     
     @GetMapping("/board")
-    public String boards(@RequestParam(value = "page", defaultValue = "1") int page, 
-    		Model model) {
-    	int pages = boardService.getPageCount();
-    	int size = 10;
-    	int pageSize = 10;
-    	int start = size * (page - 1) + 1;
-    	int end = page * size;
-    	int startPage = pageSize *( (page - 1) / pageSize ) + 1;
-    	int endPage = Math.min(startPage + pageSize - 1, pages);
+    public String boards(@ModelAttribute PageDto pageDto, Model model) {
+    	System.out.println("pageDto :" + pageDto);
+    	int pages = boardService.getPageCount(pageDto);
+    	pageDto.calcPage(pages);
+    	System.out.println("pageDto :" + pageDto);
+
+    	List<BoardVo> list = boardService.selectBoardsByKeword(pageDto);
     	
-    	List<BoardVo> list = boardService.getboards(start, end);
-    	
-    	model.addAttribute("currentPage", page);
-    	model.addAttribute("startPage", startPage);
-    	model.addAttribute("endPage", endPage);
-    	model.addAttribute("pages", pages);
+    	model.addAttribute("pageDto", pageDto);
     	model.addAttribute("list", list);
     	
         return "views/boardList";

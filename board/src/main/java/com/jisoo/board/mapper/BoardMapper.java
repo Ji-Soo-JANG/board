@@ -13,6 +13,7 @@ public interface BoardMapper {
 	public int insertBoard(BoardVo boardVo);
 	public List<BoardVo> selectAllBoards();
 	public List<BoardVo> selectBoardsPage(int start, int end); 
+	public List<BoardVo> selectTopBoardsByViews(int count);
 	public int getCount(PageDto pageDto);
 	public BoardVo selectBoard(Long boardId);
 	public int isOwner(Long boardId, Long userId);

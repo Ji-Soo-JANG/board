@@ -89,4 +89,9 @@ public class BoardMapperTest {
 	 * System.out.println("result: " + list); }
 	 */
 	
+	@Test
+	void selectTopBoardsByViews() {
+		int count = 3;
+		System.out.println("list: " + boardMapper.selectTopBoardsByViews(count));
+	}
 }

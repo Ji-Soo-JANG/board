@@ -151,6 +151,12 @@ public class BoardServiceImpl implements BoardService{
 		List<BoardVo> list = boardMapper.selectBoardsByKeword(pageDto);
 		return list;
 	}
+
+	@Override
+	public List<BoardVo> selectTopBoardsByViews(int count) {
+		List<BoardVo> list = boardMapper.selectTopBoardsByViews(count);
+		return list;
+	}
 	
 	
 }

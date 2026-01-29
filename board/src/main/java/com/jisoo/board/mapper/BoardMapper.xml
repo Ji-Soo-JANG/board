@@ -101,6 +101,15 @@
 	  		WHERE rn <![CDATA[>=]]>#{start}
 
   	</select>
+  	<select id="selectTopBoardsByViews" resultType="com.jisoo.board.domain.BoardVo">
+  		SELECT *
+  		FROM (SELECT B.*, ROWNUM rn
+  			  FROM TBL_BOARD B
+  			  WHERE DELETED_AT IS NULL
+  			  ORDER BY VIEW_COUNT DESC
+  			 )
+  		WHERE rn <![CDATA[ <= ]]> #{count}
+  	</select>
   	
   	<select id="isOwner">
   		SELECT COUNT(*)

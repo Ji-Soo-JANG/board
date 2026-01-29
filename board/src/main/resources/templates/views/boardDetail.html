@@ -22,8 +22,8 @@
 			<h3 class="mb-0">投稿詳細</h3>
 
 			<div class="d-flex align-items-center gap-2">
-				<button class="btn btn-outline-danger btn-sm" th:attr="data-board-id=${board.boardId}"
-					id="btnLike">❤️</button>
+				<button class="btn btn-report btn-outline-danger btn-sm" data-type="BOARD" th:attr="data-id=${board.boardId}">通報</button>
+				<button class="btn btn-outline-danger btn-sm" th:attr="data-board-id=${board.boardId}" id="btnLike">❤️</button>
 				<span id="likeCount" th:text="${board.likeCount}">0</span>
 			</div>
 		</div>
@@ -102,7 +102,8 @@
 
 						<div class="comment-item">
 							<p class="mb-2 mt-2 comment-view" th:text="${c.content}">コメント内容</p>
-
+							<button class="btn btn-report btn-outline-danger btn-sm" data-type="COMMENT" th:attr="data-id=${c.commentId}">通報</btn>
+							
 							<!-- 作成者のみ -->
 							<div th:if="${loginId != null and loginId == c.writerId}"
 								th:attr="data-comment-id=${c.commentId}" class="comment-owner">
@@ -133,6 +134,52 @@
 			</div>
 		</div>
 
+		<!-- modal -->
+		<div class="modal fade" id="reportModal" tabindex="-1" aria-hidden="true">
+		  <div class="modal-dialog modal-dialog-centered">
+		    <div class="modal-content">
+
+		      <div class="modal-header">
+		        <h5 class="modal-title">通報</h5>
+		        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+		      </div>
+
+		      <div class="modal-body">
+		        <form  id="reportForm" method="post">
+
+		          <input type="hidden" name="targetType">
+		          <input type="hidden" name="targetId">
+
+		          <div class="mb-3">
+		            <label class="form-label">通報理由</label>
+		            <select name="reason" class="form-select" required>
+		              <option value="">選択してください</option>
+		              <option value="SPAM">スパム</option>
+		              <option value="ABUSE">暴言・誹謗中傷</option>
+		              <option value="ADULT">不適切な内容</option>
+		              <option value="COPYRIGHT">著作権侵害</option>
+		              <option value="ETC">その他</option>
+		            </select>
+		          </div>
+
+		          <div class="mb-3">
+		            <label class="form-label">詳細（任意）</label>
+		            <textarea name="detail" class="form-control" rows="3" placeholder="具体的な内容を入力してください"></textarea>
+		          </div>
+
+			      <div class="modal-footer">
+			        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">キャンセル</button>
+			        <button type="submit" class="btn btn-danger">通報する</button>
+			      </div>
+		        </form>
+		      </div>
+
+
+		    </div>
+		  </div>
+		</div>
+		
+		
 	</main>
 
 	<footer class="border-top py-3 text-center text-muted">
@@ -140,9 +187,12 @@
 
 	<!-- script -->
 	<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
 	<script>
 
 		$(function () {
+			// like
 			$("#btnLike").on("click", function () {
 				var boardId = $(this).data("board-id");
 				console.log("boardId: " + boardId);
@@ -151,7 +201,8 @@
 					$("#likeCount").text(count + result);
 				})
 			});
-
+			
+			// comment
 			$(".btnUpdateToggle").on("click", function () {
 				const $wrap = $(this).closest(".comment-owner");
 				const $item = $(this).closest(".comment-item");
@@ -202,6 +253,30 @@
 						alert("更新に失敗しました。");
 					});
 			});
+			
+			// report
+			$(".btn-report").on("click", function () {
+				const reportModal = new bootstrap.Modal("#reportModal");
+				
+				const type = $(this).data("type");
+			    const id   = $(this).data("id");
+			    $("#reportForm input[name=targetType]").val(type);
+			    $("#reportForm input[name=targetId]").val(id);	
+				
+				// console.log(type);
+				// console.log(id);
+				
+				if (type === "BOARD") {
+				  $("#reportForm").attr("action", `/board/${id}/report`);
+				} else if (type === "COMMENT") {
+				  $("#reportForm").attr("action", `/comment/${id}/report`);
+				}
+				
+				// console.log($("#reportForm").attr("action"));
+
+				reportModal.show();
+			});
+			
 		});
 	</script>
 

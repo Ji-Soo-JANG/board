@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -11,6 +13,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -18,11 +21,13 @@ import com.jisoo.board.domain.BoardVo;
 import com.jisoo.board.domain.CommentVo;
 import com.jisoo.board.domain.MyPageDto;
 import com.jisoo.board.domain.PageDto;
+import com.jisoo.board.domain.ReportVo;
 import com.jisoo.board.domain.UserSignupDto;
 import com.jisoo.board.domain.UserVo;
 import com.jisoo.board.security.SecurityUser;
 import com.jisoo.board.service.BoardService;
 import com.jisoo.board.service.CommentService;
+import com.jisoo.board.service.ReportService;
 import com.jisoo.board.service.UserService;
 
 
@@ -32,11 +37,13 @@ public class MainController {
 	private final UserService userService;
 	private final BoardService boardService;
 	private final CommentService commentService;
+	private final ReportService reportService;
 	
-	public MainController(UserService userService, BoardService boardService, CommentService commentService) {
+	public MainController(UserService userService, BoardService boardService, CommentService commentService, ReportService reportService) {
 		this.userService = userService;
 		this.boardService = boardService;
 		this.commentService = commentService;
+		this.reportService = reportService;
 	}
 	
 	
@@ -279,6 +286,43 @@ public class MainController {
     	}
     	
         return "redirect:/board/" + boardId;
+    }
+    
+    @PostMapping("/board/{boardId}/report")
+    public String reportBoard(@PathVariable Long boardId, @ModelAttribute ReportVo reportVo, @AuthenticationPrincipal SecurityUser securityUser) {
+    	reportVo.setReporterId(securityUser.getUserId());
+    	System.out.println(reportVo);
+    	reportService.reportBoard(reportVo);
+    	
+    	
+    	return "redirect:/board/" + boardId;
+    }
+    
+    @PostMapping("/comment/{commentId}/report")
+    public String reportComment(@PathVariable Long commentId, @ModelAttribute ReportVo reportVo,
+    		@AuthenticationPrincipal SecurityUser securityUser,
+    		HttpServletRequest request) {
+    	reportVo.setReporterId(securityUser.getUserId());
+    	System.out.println(reportVo);
+    	reportService.reportBoard(reportVo);
+    	
+    	
+    	return "redirect:" + request.getHeader("Referer");
+    }
+    
+    @GetMapping("/admin")
+    public String admin(Model model) {
+    	int todayUsers =  userService.countTodayUser();
+    	int todayBoards = boardService.countTodayBoard();
+    	int pendingReports = reportService.countPendingReport();
+    	
+    	Map<String, Integer> stats = new HashMap<>();
+    	stats.put("todayUsers", todayUsers);
+    	stats.put("todayBoards", todayBoards);
+    	stats.put("pendingReports", pendingReports);
+    	
+    	model.addAttribute("stats", stats);
+        return "/views/admin";
     }
     
 }

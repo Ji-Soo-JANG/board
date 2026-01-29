@@ -61,6 +61,12 @@
 		  <artifactId>spring-boot-starter-thymeleaf</artifactId>
 		</dependency>
 
+		<!-- thymleaf extra -->
+		<dependency>
+		  <groupId>org.thymeleaf.extras</groupId>
+		  <artifactId>thymeleaf-extras-springsecurity5</artifactId>
+		</dependency>
+
 		<!-- Mybatis -->
 		<dependency>
 			<groupId>org.mybatis.spring.boot</groupId>

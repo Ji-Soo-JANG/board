@@ -20,10 +20,10 @@ public class CustomUserDetailsService implements UserDetailsService{
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 		// TODO Auto-generated method stub
-		System.out.println("userDetailsService");
-		System.out.println("receive username: " + username);
+//		System.out.println("userDetailsService");
+//		System.out.println("receive username: " + username);
 		UserVo user = mapper.findByLoginId(username);
-		System.out.println("user: " + user);
+//		System.out.println("user: " + user);
 		if (user == null) throw new UsernameNotFoundException("not found");
 	    return new SecurityUser(user);
 	}

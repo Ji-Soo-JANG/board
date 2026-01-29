@@ -41,7 +41,10 @@ public class MainController {
 	
 	
     @GetMapping("/")
-    String home(Model model) {
+    String home(@AuthenticationPrincipal SecurityUser securityUser, Model model) {
+    	List<BoardVo> boardList = boardService.selectTopBoardsByViews(3);
+    	model.addAttribute("user", securityUser);
+    	model.addAttribute("boardList", boardList);
         return "views/home";
     }
 

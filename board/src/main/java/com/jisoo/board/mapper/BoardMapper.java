@@ -14,6 +14,7 @@ public interface BoardMapper {
 	public List<BoardVo> selectAllBoards();
 	public List<BoardVo> selectBoardsPage(int start, int end); 
 	public List<BoardVo> selectTopBoardsByViews(int count);
+	public List<BoardVo> selectRecentNotices();
 	public int getCount(PageDto pageDto);
 	public BoardVo selectBoard(Long boardId);
 	public int isOwner(Long boardId, Long userId);
@@ -25,4 +26,5 @@ public interface BoardMapper {
 	public int insertBoardLike(Long boardId, Long userId);
 	public int deleteBoardLike(Long boardId, Long userId);
 	public List<BoardVo> selectBoardsByKeword(PageDto pageDto);
+	public int countTodayBoard();
 }

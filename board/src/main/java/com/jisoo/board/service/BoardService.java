@@ -12,8 +12,9 @@ public interface BoardService {
 	public boolean registerBoard(BoardVo boardVo);
 	public List<BoardVo> getAllBoards();
 	public List<BoardVo> getboards(int start, int end);
-	public List<BoardVo> selectBoardsByKeword(PageDto pageDto);
-	public List<BoardVo> selectTopBoardsByViews(int count);
+	public List<BoardVo> getBoardsByKeword(PageDto pageDto);
+	public List<BoardVo> getTopBoardsByViews(int count);
+	public List<BoardVo> getRecentNotice();
 	public int getPageCount(PageDto pageDto);
 	public BoardVo getBoard(Long boardId);
 	public boolean isOwner(Long boardId, Long userId);
@@ -25,5 +26,5 @@ public interface BoardService {
 	public boolean insertBoardLike(Long boardId, Long userId);
 	public boolean deleteBoardLike(Long boardId, Long userId);
 	int toggleLike(Long boardId, Long userId);
-
+	int countTodayBoard();
 }

@@ -10,7 +10,6 @@
 </head>
 
 <body class="bg-light">
-
 	<!-- Header -->
 	<header class="border-bottom py-3 bg-light">
 		<div class="container d-flex align-items-center">
@@ -84,11 +83,14 @@
 								<td th:text="${board.boardId}">1</td>
 
 								<td>
-									<a class="text-decoration-none fw-semibold"
-										th:href="@{/board/{id}(id=${board.boardId})}" th:text="${board.title}">
-										タイトル
-									</a>
+								  <a class="text-decoration-none fw-semibold"
+								     th:classappend="${#strings.trim(board.isNotice) == 'Y'} ? 'text-danger fw-bold' : 'text-dark'"
+								     th:href="@{/board/{id}(id=${board.boardId})}">
+								    <span th:if="${#strings.trim(board.isNotice) == 'Y'}" class="badge bg-danger me-1">お知らせ</span>
+								    <span th:text="${board.title}"></span>
+								  </a>
 								</td>
+
 
 								<td th:text="${board.writerName}">作成者</td>
 

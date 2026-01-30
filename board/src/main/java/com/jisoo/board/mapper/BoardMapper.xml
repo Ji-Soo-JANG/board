@@ -5,8 +5,8 @@
   
   <mapper namespace="com.jisoo.board.mapper.BoardMapper">
   	<insert id="insertBoard" parameterType="com.jisoo.board.domain.BoardVo">
-  		INSERT INTO TBL_BOARD(TITLE, CONTENT, WRITER_ID, WRITER_NAME)
-  		VALUES(#{title}, #{content}, #{writerId}, #{writerName})
+  		INSERT INTO TBL_BOARD(TITLE, CONTENT, WRITER_ID, WRITER_NAME, IS_NOTICE)
+  		VALUES(#{title}, #{content}, #{writerId}, #{writerName}, #{isNotice})
   	</insert>
   	
   	<select id="selectAllBoards" resultType="com.jisoo.board.domain.BoardVo">
@@ -169,4 +169,25 @@
 			AND
 			USER_ID = #{userId}
 	</delete>  	
+	
+	<select id="countTodayBoard">
+		SELECT COUNT(*)
+		FROM TBL_BOARD
+		WHERE
+			DELETED_AT IS NULL
+		AND
+			TRUNC(CREATED_AT) = TRUNC(SYSDATE)
+	</select>
+	
+	<select id="selectRecentNotices">
+		SELECT *
+		FROM (SELECT b.*, ROWNUM
+			  FROM TBL_BOARD b
+			  WHERE 
+			  	  DELETED_AT IS NULL
+			  AND
+			  	  IS_NOTICE = 'Y'
+			  ORDER BY CREATED_AT DESC)
+		WHERE ROWNUM <![CDATA[<=]]> 3
+	</select>
   </mapper>

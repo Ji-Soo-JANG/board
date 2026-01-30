@@ -19,6 +19,7 @@ public class BoardServiceImpl implements BoardService{
 	
 	@Override
 	public boolean registerBoard(BoardVo boardVo) {
+		boardVo.setIsNotice('N');
 		int insert = boardMapper.insertBoard(boardVo);
 		if(insert == 1) {
 			return true;
@@ -147,14 +148,26 @@ public class BoardServiceImpl implements BoardService{
 	}
 
 	@Override
-	public List<BoardVo> selectBoardsByKeword(PageDto pageDto) {
+	public List<BoardVo> getBoardsByKeword(PageDto pageDto) {
 		List<BoardVo> list = boardMapper.selectBoardsByKeword(pageDto);
 		return list;
 	}
 
 	@Override
-	public List<BoardVo> selectTopBoardsByViews(int count) {
+	public List<BoardVo> getTopBoardsByViews(int count) {
 		List<BoardVo> list = boardMapper.selectTopBoardsByViews(count);
+		return list;
+	}
+
+	@Override
+	public int countTodayBoard() {
+		int count = boardMapper.countTodayBoard();
+		return count;
+	}
+
+	@Override
+	public List<BoardVo> getRecentNotice() {
+		List<BoardVo> list = boardMapper.selectRecentNotices();
 		return list;
 	}
 	

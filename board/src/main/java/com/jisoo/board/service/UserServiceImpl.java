@@ -1,5 +1,7 @@
 package com.jisoo.board.service;
 
+import java.util.List;
+
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -69,5 +71,11 @@ public class UserServiceImpl implements UserService {
 			return true;
 		}
 		return false;
+	}
+
+	@Override
+	public int countTodayUser() {
+		int count = userMapper.countTodayUser();
+		return count;
 	}
 }

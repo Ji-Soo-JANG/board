@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -25,6 +24,7 @@ import com.jisoo.board.domain.ReportVo;
 import com.jisoo.board.domain.UserSignupDto;
 import com.jisoo.board.domain.UserVo;
 import com.jisoo.board.security.SecurityUser;
+import com.jisoo.board.service.AdminService;
 import com.jisoo.board.service.BoardService;
 import com.jisoo.board.service.CommentService;
 import com.jisoo.board.service.ReportService;
@@ -38,20 +38,31 @@ public class MainController {
 	private final BoardService boardService;
 	private final CommentService commentService;
 	private final ReportService reportService;
+	private final AdminService adminService;
 	
-	public MainController(UserService userService, BoardService boardService, CommentService commentService, ReportService reportService) {
+	public MainController(UserService userService, BoardService boardService, CommentService commentService, ReportService reportService, AdminService adminService) {
 		this.userService = userService;
 		this.boardService = boardService;
 		this.commentService = commentService;
 		this.reportService = reportService;
+		this.adminService = adminService;
 	}
 	
+	private Map<String, Integer> addStats(Model model) {
+	    Map<String, Integer> stats = new HashMap<>();
+	    stats.put("todayUsers", userService.countTodayUser());
+	    stats.put("todayBoards", boardService.countTodayBoard());
+	    stats.put("pendingReports", reportService.countPendingReport());
+	    return stats;
+	}
 	
     @GetMapping("/")
     String home(@AuthenticationPrincipal SecurityUser securityUser, Model model) {
-    	List<BoardVo> boardList = boardService.selectTopBoardsByViews(3);
+    	List<BoardVo> boardList = boardService.getTopBoardsByViews(3);
+    	List<BoardVo> noticeList = boardService.getRecentNotice();
     	model.addAttribute("user", securityUser);
     	model.addAttribute("boardList", boardList);
+    	model.addAttribute("noticeList", noticeList);
         return "views/home";
     }
 
@@ -153,7 +164,7 @@ public class MainController {
     	pageDto.calcPage(pages);
     	System.out.println("pageDto :" + pageDto);
 
-    	List<BoardVo> list = boardService.selectBoardsByKeword(pageDto);
+    	List<BoardVo> list = boardService.getBoardsByKeword(pageDto);
     	
     	model.addAttribute("pageDto", pageDto);
     	model.addAttribute("list", list);
@@ -170,9 +181,24 @@ public class MainController {
     
     @PostMapping("/board/write")
     public String write(@ModelAttribute BoardVo boardVo, @AuthenticationPrincipal SecurityUser user, Model model) {
+//    	System.out.println("isNotice: " + boardVo.getIsNotice());
+    	boolean isNotice = "Y".equals(String.valueOf(boardVo.getIsNotice()));
+    	boolean isAdmin = user.getAuthorities().stream()
+    	        .anyMatch(a -> "ROLE_ADMIN".equals(a.getAuthority()));
+    	
     	boardVo.setWriterId(user.getUserId());
     	boardVo.setWriterName(user.getUsername());
-    	boardService.registerBoard(boardVo);
+    	
+//    	System.out.println("isNotice: " + isNotice);
+//    	System.out.println("isAdmin: " + isAdmin);
+//    	System.out.println("boardVo: " + boardVo);
+    	
+    	if(isAdmin && isNotice) {
+    		adminService.writeNotice(boardVo);
+    	}
+    	else {
+    		boardService.registerBoard(boardVo);
+    	}
         return "redirect:/board";
     }
     
@@ -306,23 +332,41 @@ public class MainController {
     	System.out.println(reportVo);
     	reportService.reportBoard(reportVo);
     	
-    	
     	return "redirect:" + request.getHeader("Referer");
     }
     
     @GetMapping("/admin")
     public String admin(Model model) {
-    	int todayUsers =  userService.countTodayUser();
-    	int todayBoards = boardService.countTodayBoard();
-    	int pendingReports = reportService.countPendingReport();
-    	
-    	Map<String, Integer> stats = new HashMap<>();
-    	stats.put("todayUsers", todayUsers);
-    	stats.put("todayBoards", todayBoards);
-    	stats.put("pendingReports", pendingReports);
-    	
-    	model.addAttribute("stats", stats);
+        Map<String, Integer> stats = addStats(model);
+        model.addAttribute("stats", stats);
         return "/views/admin";
+    }
+    
+    @GetMapping("/admin/users")
+    public String users(
+        @RequestParam(required = false) String keyword, @RequestParam(required = false) String role,
+        @RequestParam(defaultValue = "1") int page, Model model) {
+
+    	Map<String, Integer> stats = addStats(model);
+        List<UserVo> users = adminService.searchUsers(keyword, role, page);
+
+        model.addAttribute("stats", stats);
+        model.addAttribute("users", users);
+        model.addAttribute("page", page);
+
+        return "views/admin";
+    }
+    
+    @PostMapping("/admin/users/{userId}/role")
+    public String promoteToManager(@PathVariable Long userId) {
+        adminService.changeRole(userId, "ROLE_ADMIN");
+        return "redirect:/admin#users";
+    }
+    
+    @PostMapping("/admin/users/{userId}/suspend")
+    public String suspendUser(@PathVariable Long userId, @RequestParam int days) {
+        adminService.suspendUser(userId, days);
+        return "redirect:/admin#users";
     }
     
 }

@@ -11,11 +11,15 @@
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script>
 	const p = new URLSearchParams(location.search);
-	if (p.has("error")){
-		alert("		パスワードが正しくありません。");
-		location.href = "/login";		
+	const error = p.get("error");
+
+	if (error) {
+	  if (error === "bad_credentials") alert("パスワードが正しくありません。");
+	  else if (error === "suspended") alert("このアカウントは一時停止中です。");
+	  else alert("ログインに失敗しました。");
+	  location.href = "/login";
 	}
-	
+		
 	var idOk = false;
 	
 	$(function(){

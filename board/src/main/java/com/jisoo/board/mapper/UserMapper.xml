@@ -17,29 +17,13 @@
   	</insert>
   	
   	<select id="findByLoginId" parameterType="string" resultType="com.jisoo.board.domain.UserVo">
-	  SELECT
-	    USER_ID,
-	    LOGIN_ID,
-	    PASSWORD,
-	    NICKNAME,
-	    ROLE,
-	    CREATED_AT,
-	    UPDATED_AT,
-	    DELETED_AT
+	  SELECT *
 	  FROM TBL_USER
 	  WHERE LOGIN_ID = #{loginId}
 	</select>
 	
 	<select id="findByUserId" parameterType="Long" resultType="com.jisoo.board.domain.UserVo">
-	  SELECT
-	    USER_ID,
-	    LOGIN_ID,
-	    PASSWORD,
-	    NICKNAME,
-	    ROLE,
-	    CREATED_AT,
-	    UPDATED_AT,
-	    DELETED_AT
+	  SELECT *
 	  FROM TBL_USER
 	  WHERE USER_ID = #{userId}
 	</select>
@@ -64,4 +48,63 @@
 		WHERE USER_ID = #{userId}
 	</update>
 	
+	<select id="countTodayUser">
+		SELECT COUNT(*)
+		FROM TBL_USER
+		WHERE TRUNC(CREATED_AT) = TRUNC(SYSDATE)
+	</select>
+	
+	<select id="findUsers" resultType="com.jisoo.board.domain.UserVo">
+	    SELECT *
+	    FROM (
+	        SELECT t.*, ROWNUM rn
+	        FROM (
+	            SELECT *
+	            FROM TBL_USER
+	            <where>
+	            AND ROLE != 'ROLE_ADMIN'
+	                <if test="keyword != null and keyword != ''">
+	                    AND (
+	                        LOGIN_ID LIKE '%' || #{keyword} || '%'
+	                        OR NICKNAME LIKE '%' || #{keyword} || '%'
+	                    )
+	                </if>
+	
+	                <if test="role != null and role != ''">
+	                    AND ROLE = #{role}
+	                </if>
+	            </where>
+	            ORDER BY CREATED_AT DESC
+	        ) t
+	        WHERE ROWNUM &lt;= #{offset} + #{limit}
+	    )
+    	WHERE rn &gt; #{offset}
+	</select>
+	
+	<update id="updateRole">
+		UPDATE TBL_USER
+		SET ROLE = #{role}
+		WHERE USER_ID = #{userId}
+	</update>
+	
+	<update id="suspendUser">
+	    UPDATE TBL_USER
+	    SET status = 'SUSPENDED',
+	        suspended_until = #{until}
+	    WHERE user_id = #{userId}
+	</update>
+	
+	<update id="banUser">
+	    UPDATE TBL_USER
+	    SET status = 'BANNED',
+	        suspended_until = NULL
+	    WHERE user_id = #{userId}
+	</update>
+	
+	<update id="unsuspendUser">
+	    UPDATE TBL_USER
+	    SET status = 'ACTIVE',
+	        suspended_until = NULL
+	    WHERE user_id = #{userId}
+	</update>
   </mapper>

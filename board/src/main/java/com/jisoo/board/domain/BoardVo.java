@@ -30,8 +30,10 @@ public class BoardVo {
                "  content=" + content.substring(0, end) + "\n" +
                "  writerId=" + writerId + "\n" +
                "  writerName=" + writerName + "\n" +
-               "  likeCount=" + likeCount + "\n" +
                "  viewCount=" + viewCount + "\n" +
+               "  likeCount=" + likeCount + "\n" +
+               "  commentCount=" + commentCount + "\n" +
+               "  isNotice=" + isNotice + "\n" +
                "  createdAt=" + createdAt + "\n" +
                "  updatedAt=" + updatedAt + "\n" +
                "  deletedAt=" + deletedAt + "\n" +

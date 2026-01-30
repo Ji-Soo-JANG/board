@@ -1,5 +1,8 @@
 package com.jisoo.board.security;
 
+import java.util.Date;
+
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -24,7 +27,18 @@ public class CustomUserDetailsService implements UserDetailsService{
 //		System.out.println("receive username: " + username);
 		UserVo user = mapper.findByLoginId(username);
 //		System.out.println("user: " + user);
+		System.out.println(user.getStatus());
 		if (user == null) throw new UsernameNotFoundException("not found");
+
+	    if ("BANNED".equals(user.getStatus())) {
+	        throw new DisabledException("banned");
+	    }
+
+	    if ("SUSPENDED".equals(user.getStatus())
+	        && user.getSuspendedUntil() != null
+	        && user.getSuspendedUntil().after(new Date())) {
+	        throw new DisabledException("suspended");
+	    }
 	    return new SecurityUser(user);
 	}
 

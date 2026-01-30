@@ -1,5 +1,6 @@
 package com.jisoo.board.domain;
 
+import java.util.Date;
 import lombok.Data;
 
 @Data
@@ -12,4 +13,6 @@ public class UserVo {
 	private java.time.LocalDateTime createdAt;
 	private java.time.LocalDateTime updatedAt;
 	private java.time.LocalDateTime deletedAt;
+	private String status;      
+    private Date suspendedUntil;
 }

@@ -22,7 +22,7 @@ public class BoardServiceTest {
 	@Autowired
 	private UserService userService;
 	
-	@Disabled
+//	@Disabled
 	@Test
 	void registerTest() {
 		UserVo userVo = userService.findByUserId(20L);
@@ -80,6 +80,7 @@ public class BoardServiceTest {
 		System.out.println(boardService.getBoard(boardId));
 	}
 	
+	@Disabled
 	@Test
 	void deleteBaordTest() {
 		Long boardId = 30L;

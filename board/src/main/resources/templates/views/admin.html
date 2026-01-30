@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+	<meta charset="UTF-8">
+	<title>admin</title>
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body class="bg-light">
+
+	<!-- Header -->
+	<header class="border-bottom py-3 bg-light">
+		<div class="container d-flex align-items-center">
+
+			<h2 class="mb-0">LOGO</h2>
+
+			<div class="ms-auto d-flex align-items-center gap-2">
+				<span class="text-muted small">
+					<span sec:authentication="name">user</span>
+					/
+					<span sec:authentication="authorities">ROLE</span>
+				</span>
+				<a class="btn btn-outline-dark btn-sm" href="/">home</a>
+				<form th:action="@{/logout}" method="post" class="mb-0">
+					<button class="btn btn-outline-dark btn-sm" type="submit">Logout</button>
+				</form>
+			</div>
+
+		</div>
+	</header>
+
+
+	<div class="container py-4">
+		<div class="row g-3">
+
+			<!-- サイドバー -->
+			<aside class="col-12 col-lg-2">
+				<div class="card shadow-sm border admin-sidebar sticky-top">
+					<div class="card-body">
+						<h6 class="mb-3 fw-bold">管理メニュー</h6>
+
+						<div sec:authorize="hasRole('ADMIN')">
+							<div class="list-group">
+							  <a class="list-group-item list-group-item-action" href="#dashboard" data-target="dashboard">ダッシュボード</a>
+							  <a class="list-group-item list-group-item-action" href="#users" data-target="users">ユーザー管理</a>
+							  <a class="list-group-item list-group-item-action" href="#boards" data-target="boards">投稿管理</a>
+							</div>
+
+						</div>
+
+						<div sec:authorize="!hasRole('ADMIN')" class="alert alert-warning mt-3 mb-0">
+							管理者権限が必要です。
+						</div>
+					</div>
+				</div>
+			</aside>
+
+			<!-- メイン -->
+			<main class="col-12 col-lg-10">
+
+				<!-- ダッシュボード -->
+				<section id="dashboard" class="mb-4" sec:authorize="hasRole('ADMIN')">
+					<h4 class="mb-3">ダッシュボード</h4>
+
+					<div class="row g-3">
+						<div class="col-12 col-md-4">
+							<div class="card shadow-sm">
+								<div class="card-body">
+									<div class="text-muted small">今日の投稿数</div>
+									<div class="fs-3 fw-bold" th:text="${stats.todayBoards}">0</div>
+								</div>
+							</div>
+						</div>
+
+						<div class="col-12 col-md-4">
+							<div class="card shadow-sm">
+								<div class="card-body">
+									<div class="text-muted small">今日の登録者数</div>
+									<div class="fs-3 fw-bold" th:text="${stats.todayUsers}">0</div>
+								</div>
+							</div>
+						</div>
+
+						<div class="col-12 col-md-4">
+							<div class="card shadow-sm">
+								<div class="card-body">
+									<div class="text-muted small">未処理の通報</div>
+									<div class="fs-3 fw-bold" th:text="${stats.pendingReports}">0</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</section>
+
+				<!-- ユーザー管理 -->
+				<section id="users" class="mb-4" sec:authorize="hasRole('ADMIN')">
+					<h4 class="mb-3">ユーザー管理</h4>
+
+					<div class="card shadow-sm">
+						<div class="card-body">
+
+							<!-- 検索 -->
+							<form class="row g-2 mb-3" th:action="@{/admin/users}" method="get">
+								<div class="col-12 col-md-4">
+									<input type="text" class="form-control" name="keyword"
+										placeholder="loginId / nickname" th:value="${param.keyword}">
+								</div>
+								<div class="col-12 col-md-3">
+									<select class="form-select" name="role">
+										<option value="">全て</option>
+										<option value="ROLE_USER" th:selected="${param.role == 'ROLE_USER'}">ユーザー
+										</option>
+										<option value="ROLE_ADMIN" th:selected="${param.role == 'ROLE_ADMIN'}">
+											マネージャー</option>
+									</select>
+								</div>
+								<div class="col-12 col-md-2">
+									<button class="btn btn-primary w-100" type="submit">検索</button>
+								</div>
+							</form>
+
+							<!-- リスト -->
+							<div class="table-responsive">
+								<table class="table table-hover align-middle">
+									<thead>
+										<tr>
+											<th style="width:80px;">ID</th>
+											<th style="width:220px;">LOGIN</th>
+											<th style="width:220px;">NICKNAME</th>
+											<th style="width:220px;">ACTION</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr th:each="u : ${users}">
+											<td th:text="${u.userId}">1</td>
+											<td th:text="${u.loginId}">id</td>
+											<td th:text="${u.nickname}">nick</td>
+											<td class="d-flex gap-2">
+												<form th:action="@{/admin/users/{id}/role(id=${u.userId})}"
+													method="post" class="mb-0">
+													<input type="hidden" name="role" value="ROLE_ADMIN">
+													<button class="btn btn-outline-success btn-sm"
+														type="submit">マネージャーにする</button>
+												</form>
+												
+												<form th:action="@{/admin/users/{id}/suspend(id=${u.userId})}"
+												      method="post" class="d-flex gap-2 align-items-center">
+
+												    <select name="days" class="form-select form-select-sm w-auto">
+												        <option value="1">1日</option>
+												        <option value="3">3日</option>
+												        <option value="7">7日</option>
+												        <option value="30">30日</option>
+												        <option value="9999">永久</option>
+												    </select>
+
+												    <button class="btn btn-outline-warning btn-sm" type="submit">
+												        制裁
+												    </button>
+												</form>
+
+											</td>
+										</tr>
+										<tr th:if="${#lists.isEmpty(users)}">
+											<td colspan="5" class="text-muted">ユーザーがいません。</td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+
+						</div>
+					</div>
+				</section>
+
+				<!-- 게시글 관리 -->
+				<section id="boards" class="mb-4" sec:authorize="hasRole('ADMIN')">
+					<h4 class="mb-3">投稿管理</h4>
+
+					<div class="card shadow-sm">
+						<div class="card-body">
+
+							<!-- 검색/필터 -->
+							<!--            <form class="row g-2 mb-3" th:action="@{/admin/boards}" method="get">-->
+							<!--              <div class="col-12 col-md-5">-->
+							<!--                <input type="text" class="form-control" name="keyword" placeholder="title / writer"-->
+							<!--                       th:value="${param.keyword}">-->
+							<!--              </div>-->
+							<!--              <div class="col-12 col-md-3">-->
+							<!--                <select class="form-select" name="deleted">-->
+							<!--                  <option value="" th:selected="${param.deleted == null}">削除除外</option>-->
+							<!--                  <option value="all" th:selected="${param.deleted == 'all'}">削除含む</option>-->
+							<!--                  <option value="only" th:selected="${param.deleted == 'only'}">削除のみ</option>-->
+							<!--                </select>-->
+							<!--              </div>-->
+							<!--              <div class="col-12 col-md-2">-->
+							<!--                <button class="btn btn-primary w-100" type="submit">検索</button>-->
+							<!--              </div>-->
+							<!--            </form>-->
+
+							<div class="table-responsive">
+								<table class="table table-hover align-middle">
+									<thead>
+										<tr>
+											<th style="width:80px;">ID</th>
+											<th>タイトル</th>
+											<th style="width:160px;">作成者</th>
+											<th style="width:120px;" class="text-end">VIEW</th>
+											<th style="width:120px;">状態</th>
+											<th style="width:260px;">ACTION</th>
+										</tr>
+									</thead>
+
+									<tbody>
+										<!--                <tr th:each="b : ${boards}">-->
+										<!--                  <td th:text="${b.boardId}">1</td>-->
+										<!--                  <td>-->
+										<!--                    <a th:href="@{/board/{id}(id=${b.boardId})}"-->
+										<!--                       class="text-decoration-none"-->
+										<!--                       th:text="${b.title}">title</a>-->
+										<!--                  </td>-->
+										<!--                  <td th:text="${b.writerName}">writer</td>-->
+										<!--                  <td class="text-end" th:text="${b.viewCount}">0</td>-->
+										<!--                  <td>-->
+										<!--                    <span th:if="${b.deletedAt == null}" class="badge bg-success">ACTIVE</span>-->
+										<!--                    <span th:if="${b.deletedAt != null}" class="badge bg-danger">DELETED</span>-->
+										<!--                  </td>-->
+										<!--                  <td class="d-flex gap-2">-->
+
+										<!--                     강제 삭제(soft delete) -->
+										<!--                    <form th:if="${b.deletedAt == null}"-->
+										<!--                          th:action="@{/admin/boards/{id}/delete(id=${b.boardId})}" method="post" class="mb-0">-->
+										<!--                      <button class="btn btn-outline-danger btn-sm" type="submit">削除</button>-->
+										<!--                    </form>-->
+
+										<!--                     복구 -->
+										<!--                    <form th:if="${b.deletedAt != null}"-->
+										<!--                          th:action="@{/admin/boards/{id}/restore(id=${b.boardId})}" method="post" class="mb-0">-->
+										<!--                      <button class="btn btn-outline-primary btn-sm" type="submit">復元</button>-->
+										<!--                    </form>-->
+
+										<!--                     공지/고정 같은 토글(예시) -->
+										<!--                    <form th:action="@{/admin/boards/{id}/pin(id=${b.boardId})}" method="post" class="mb-0">-->
+										<!--                      <button class="btn btn-outline-secondary btn-sm" type="submit">PIN切替</button>-->
+										<!--                    </form>-->
+
+										<!--                  </td>-->
+										<!--                </tr>-->
+
+										<tr>
+											<td colspan="6" class="text-muted">投稿がありません。</td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+
+						</div>
+					</div>
+				</section>
+
+			</main>
+		</div>
+	</div>
+
+	<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+	<script>
+		$(function(){
+			$(".admin-sidebar .list-group-item").on("click", function () {
+			  $(".admin-sidebar .list-group-item").removeClass("active");
+			  $(this).addClass("active");
+			});
+		});
+
+		
+	</script>
+</body>
+
+</html>

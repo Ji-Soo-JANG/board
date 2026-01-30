@@ -1,5 +1,7 @@
 package com.jisoo.board.service;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 
 import com.jisoo.board.domain.UserSignupDto;
@@ -15,4 +17,5 @@ public interface UserService {
 	public UserVo findByUserId(Long userId);
 	public boolean updateUserInfo(Long userId, String nickname);
 	public boolean updatePassword(Long userId, String password);
+	public int countTodayUser();
 }

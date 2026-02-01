@@ -42,9 +42,12 @@
 
 						<div sec:authorize="hasRole('ADMIN')">
 							<div class="list-group">
-							  <a class="list-group-item list-group-item-action" href="#dashboard" data-target="dashboard">ダッシュボード</a>
-							  <a class="list-group-item list-group-item-action" href="#users" data-target="users">ユーザー管理</a>
-							  <a class="list-group-item list-group-item-action" href="#boards" data-target="boards">投稿管理</a>
+								<a class="list-group-item list-group-item-action" href="#dashboard"
+									data-target="dashboard">ダッシュボード</a>
+								<a class="list-group-item list-group-item-action" href="#users"
+									data-target="users">ユーザー管理</a>
+								<a class="list-group-item list-group-item-action" href="#boards"
+									data-target="boards">投稿管理</a>
 							</div>
 
 						</div>
@@ -143,21 +146,21 @@
 													<button class="btn btn-outline-success btn-sm"
 														type="submit">マネージャーにする</button>
 												</form>
-												
+
 												<form th:action="@{/admin/users/{id}/suspend(id=${u.userId})}"
-												      method="post" class="d-flex gap-2 align-items-center">
+													method="post" class="d-flex gap-2 align-items-center">
 
-												    <select name="days" class="form-select form-select-sm w-auto">
-												        <option value="1">1日</option>
-												        <option value="3">3日</option>
-												        <option value="7">7日</option>
-												        <option value="30">30日</option>
-												        <option value="9999">永久</option>
-												    </select>
+													<select name="days" class="form-select form-select-sm w-auto">
+														<option value="1">1日</option>
+														<option value="3">3日</option>
+														<option value="7">7日</option>
+														<option value="30">30日</option>
+														<option value="9999">永久</option>
+													</select>
 
-												    <button class="btn btn-outline-warning btn-sm" type="submit">
-												        制裁
-												    </button>
+													<button class="btn btn-outline-warning btn-sm" type="submit">
+														制裁
+													</button>
 												</form>
 
 											</td>
@@ -173,31 +176,12 @@
 					</div>
 				</section>
 
-				<!-- 게시글 관리 -->
+				<!-- 投稿管理 -->
 				<section id="boards" class="mb-4" sec:authorize="hasRole('ADMIN')">
 					<h4 class="mb-3">投稿管理</h4>
 
 					<div class="card shadow-sm">
 						<div class="card-body">
-
-							<!-- 검색/필터 -->
-							<!--            <form class="row g-2 mb-3" th:action="@{/admin/boards}" method="get">-->
-							<!--              <div class="col-12 col-md-5">-->
-							<!--                <input type="text" class="form-control" name="keyword" placeholder="title / writer"-->
-							<!--                       th:value="${param.keyword}">-->
-							<!--              </div>-->
-							<!--              <div class="col-12 col-md-3">-->
-							<!--                <select class="form-select" name="deleted">-->
-							<!--                  <option value="" th:selected="${param.deleted == null}">削除除外</option>-->
-							<!--                  <option value="all" th:selected="${param.deleted == 'all'}">削除含む</option>-->
-							<!--                  <option value="only" th:selected="${param.deleted == 'only'}">削除のみ</option>-->
-							<!--                </select>-->
-							<!--              </div>-->
-							<!--              <div class="col-12 col-md-2">-->
-							<!--                <button class="btn btn-primary w-100" type="submit">検索</button>-->
-							<!--              </div>-->
-							<!--            </form>-->
-
 							<div class="table-responsive">
 								<table class="table table-hover align-middle">
 									<thead>
@@ -205,50 +189,26 @@
 											<th style="width:80px;">ID</th>
 											<th>タイトル</th>
 											<th style="width:160px;">作成者</th>
-											<th style="width:120px;" class="text-end">VIEW</th>
-											<th style="width:120px;">状態</th>
-											<th style="width:260px;">ACTION</th>
+											<th style="width:120px;" class="text-end">通報カウント</th>
 										</tr>
 									</thead>
 
 									<tbody>
-										<!--                <tr th:each="b : ${boards}">-->
-										<!--                  <td th:text="${b.boardId}">1</td>-->
-										<!--                  <td>-->
-										<!--                    <a th:href="@{/board/{id}(id=${b.boardId})}"-->
-										<!--                       class="text-decoration-none"-->
-										<!--                       th:text="${b.title}">title</a>-->
-										<!--                  </td>-->
-										<!--                  <td th:text="${b.writerName}">writer</td>-->
-										<!--                  <td class="text-end" th:text="${b.viewCount}">0</td>-->
-										<!--                  <td>-->
-										<!--                    <span th:if="${b.deletedAt == null}" class="badge bg-success">ACTIVE</span>-->
-										<!--                    <span th:if="${b.deletedAt != null}" class="badge bg-danger">DELETED</span>-->
-										<!--                  </td>-->
-										<!--                  <td class="d-flex gap-2">-->
+										<tr th:each="b : ${boards}" th:attr="data-board-id=${b.boardId}">
+											<td th:text="${b.boardId}">1</td>
+											<td>
+												<a class="text-decoration-none js-report-detail reported-board"
+													th:text="${b.title}">
+												</a>
 
-										<!--                     강제 삭제(soft delete) -->
-										<!--                    <form th:if="${b.deletedAt == null}"-->
-										<!--                          th:action="@{/admin/boards/{id}/delete(id=${b.boardId})}" method="post" class="mb-0">-->
-										<!--                      <button class="btn btn-outline-danger btn-sm" type="submit">削除</button>-->
-										<!--                    </form>-->
-
-										<!--                     복구 -->
-										<!--                    <form th:if="${b.deletedAt != null}"-->
-										<!--                          th:action="@{/admin/boards/{id}/restore(id=${b.boardId})}" method="post" class="mb-0">-->
-										<!--                      <button class="btn btn-outline-primary btn-sm" type="submit">復元</button>-->
-										<!--                    </form>-->
-
-										<!--                     공지/고정 같은 토글(예시) -->
-										<!--                    <form th:action="@{/admin/boards/{id}/pin(id=${b.boardId})}" method="post" class="mb-0">-->
-										<!--                      <button class="btn btn-outline-secondary btn-sm" type="submit">PIN切替</button>-->
-										<!--                    </form>-->
-
-										<!--                  </td>-->
-										<!--                </tr>-->
+											</td>
+											<td th:text="${b.userId}">writer</td>
+											<td class="text-end" th:text="${b.reportCount}">0</td>
+										</tr>
 
 										<tr>
-											<td colspan="6" class="text-muted">投稿がありません。</td>
+											<td th:if="${#lists.isEmpty(boards)}" colspan="6" class="text-muted">
+												投稿がありません。</td>
 										</tr>
 									</tbody>
 								</table>
@@ -262,17 +222,97 @@
 		</div>
 	</div>
 
+	<div class="modal fade" id="reportDetailModal" tabindex="-1" aria-hidden="true">
+		<div class="modal-dialog modal-lg modal-dialog-scrollable">
+			<div class="modal-content">
+
+				<div class="modal-header">
+					<h5 class="modal-title">投稿詳細</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+
+				<div class="modal-body">
+					<div class="d-flex flex-wrap gap-2 mb-3">
+						<span id="modalTitle">タイトル</span>
+					</div>
+
+					<div id="modalContent" class="border rounded p-3 bg-white" style="min-height: 180px;"></div>
+
+					<div class="mt-4">
+						<h6 class="fw-bold mb-2">通報内容</h6>
+						<div id="modalReports" class="small text-muted">-</div>
+					</div>
+				</div>
+
+				<div class="modal-footer flex-column align-items-stretch">
+
+					<form id="modalForm" method="post" class="d-flex justify-content-end gap-2">
+						<div>
+							<span>user</span>
+							<input type="checkbox" id="suspendCheck" name="suspend" value="true">
+							<select name="days" class="form-select form-select-sm w-auto">
+								<option value="1">1日</option>
+								<option value="3">3日</option>
+								<option value="7">7日</option>
+								<option value="30">30日</option>
+								<option value="9999">永久</option>
+							</select>
+						</div>
+	
+						<div class="d-flex justify-content-end gap-2">
+							<button type="button" class="btn-process btn btn-danger" data-process="resolve">削除</button>
+							<button type="button" class="btn-process btn btn-secondary" data-process="reject">却下</button>
+						</div>
+						<input id="inputUserId" name="userId" hidden>
+						<input id="inputBoardId" name="boardId" hidden>
+						<input id="inputAction" name="action" hidden>
+					</form>
+
+				</div>
+
+			</div>
+		</div>
+	</div>
+
 	<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 	<script>
-		$(function(){
+		$(function () {
 			$(".admin-sidebar .list-group-item").on("click", function () {
-			  $(".admin-sidebar .list-group-item").removeClass("active");
-			  $(this).addClass("active");
+				$(".admin-sidebar .list-group-item").removeClass("active");
+				$(this).addClass("active");
+			});
+
+			$(".reported-board").on("click", function () {
+				const reportModal = new bootstrap.Modal("#reportDetailModal");
+				const $tr = $(this).closest("tr");
+				const boardId = $tr.data("board-id");
+				
+
+				$.get("/admin/boards/" + boardId, function (data) {
+					console.log(data);
+					$("#inputBoardId").val(data.boardId);
+					$("#inputUserId").val(data.userId);
+					
+					const $ul = $("#modalReports").empty();
+					data.list.forEach(r => {
+						$ul.append(`<li class="list-unstyled">${r.reason} - ${r.detail ?? ""}</li>`);
+					});
+					$("#modalTitle").text(data.title);
+					$("#modalContent").html(data.content);
+				});
+
+				reportModal.show();
+			});
+			
+			$(".btn-process").on("click", function(){
+				console.log($(this).data("process"));
+				$("#inputAction").val($(this).data("process"));
+				$("#modalForm").attr("action", `/admin/report/process`).submit();
 			});
 		});
 
-		
+
 	</script>
 </body>
 

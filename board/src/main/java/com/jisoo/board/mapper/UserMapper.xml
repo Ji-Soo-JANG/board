@@ -65,7 +65,8 @@
 	            AND ROLE != 'ROLE_ADMIN'
 	                <if test="keyword != null and keyword != ''">
 	                    AND (
-	                        LOGIN_ID LIKE '%' || #{keyword} || '%'
+	                        USER_ID LIKE '%' || #{keyword} || '%'
+	                        OR LOGIN_ID LIKE '%' || #{keyword} || '%'
 	                        OR NICKNAME LIKE '%' || #{keyword} || '%'
 	                    )
 	                </if>

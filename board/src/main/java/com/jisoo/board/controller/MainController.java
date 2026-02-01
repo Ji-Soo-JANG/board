@@ -21,6 +21,8 @@ import com.jisoo.board.domain.CommentVo;
 import com.jisoo.board.domain.MyPageDto;
 import com.jisoo.board.domain.PageDto;
 import com.jisoo.board.domain.ReportVo;
+import com.jisoo.board.domain.ReportedBoardDetailDto;
+import com.jisoo.board.domain.ReportedBoardDto;
 import com.jisoo.board.domain.UserSignupDto;
 import com.jisoo.board.domain.UserVo;
 import com.jisoo.board.security.SecurityUser;
@@ -54,6 +56,11 @@ public class MainController {
 	    stats.put("todayBoards", boardService.countTodayBoard());
 	    stats.put("pendingReports", reportService.countPendingReport());
 	    return stats;
+	}
+	
+	private List<ReportedBoardDto> addReportedBoards(Model model){
+    	List<ReportedBoardDto> boards = adminService.selectReportedBoards();
+    	return boards;
 	}
 	
     @GetMapping("/")
@@ -338,7 +345,10 @@ public class MainController {
     @GetMapping("/admin")
     public String admin(Model model) {
         Map<String, Integer> stats = addStats(model);
+    	List<ReportedBoardDto> boards = addReportedBoards(model);
+
         model.addAttribute("stats", stats);
+        model.addAttribute("boards", boards);
         return "/views/admin";
     }
     
@@ -349,9 +359,11 @@ public class MainController {
 
     	Map<String, Integer> stats = addStats(model);
         List<UserVo> users = adminService.searchUsers(keyword, role, page);
+        List<ReportedBoardDto> boards = addReportedBoards(model);
 
         model.addAttribute("stats", stats);
         model.addAttribute("users", users);
+        model.addAttribute("boards", boards);
         model.addAttribute("page", page);
 
         return "views/admin";
@@ -368,5 +380,26 @@ public class MainController {
         adminService.suspendUser(userId, days);
         return "redirect:/admin#users";
     }
+    
+    @GetMapping("/admin/boards/{boardId}")
+    @ResponseBody
+    public ReportedBoardDetailDto boards(@PathVariable Long boardId, Model model) {
+    	ReportedBoardDetailDto detail = adminService.getDetail(boardId);
+    	
+    	return detail;
+    }
+    
+    @PostMapping("/admin/report/process")
+    public String reportProcess(@RequestParam String action,
+					    	    @RequestParam Long boardId,
+					    	    @RequestParam Long userId,
+					    	    @RequestParam(required=false) Boolean suspend,
+					    	    @RequestParam(required=false) Integer days,
+					    	    @AuthenticationPrincipal SecurityUser securityUser) {
+    	adminService.processReport(action, boardId, userId, suspend, days, securityUser.getUserId());
+    	
+    	return "redirect:/admin#boards";
+    }
+    
     
 }

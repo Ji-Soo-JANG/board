@@ -5,11 +5,12 @@ import java.util.List;
 import lombok.Data;
 
 @Data
-public class ReportedBoardDetailDto {
+public class ReportedDetailDto {
+	private String targetType;
+	private Long targetId;	
+	private Long userId;
 	private Long boardId;
 	private String title;
 	private String content;
-	private Long userId;
-
 	private List<ReportVo> list; 
 }

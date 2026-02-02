@@ -1,13 +1,16 @@
 package com.jisoo.board.mapper;
 
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Select;
+import java.util.List;
 
-import com.jisoo.board.domain.UserVo;
+import org.apache.ibatis.annotations.Mapper;
+
+import com.jisoo.board.domain.ReportedBoardDto;
+import com.jisoo.board.domain.ReportedCommentDto;
 
 @Mapper
 public interface AdminMapper {
 	public int deleteBoard(Long boardId);
 	public int recoveryBoard(Long boardId);
+	public List<ReportedBoardDto> selectReportsByType();
+	public List<ReportedCommentDto> selectReportedComments();
 }

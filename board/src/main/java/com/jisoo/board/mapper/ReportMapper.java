@@ -12,7 +12,6 @@ import com.jisoo.board.domain.ReportedBoardDto;
 public interface ReportMapper {
 	 public int countPendingReports(); 
 	 public int insertReport(ReportVo reportVo);
-	 public List<ReportedBoardDto> selectReportsByType(String type);
 	 public List<ReportVo> selectReportsById(@Param("targetType") String targetType, @Param("targetId") Long targetId);
 	 public int updateByTarget(@Param("status") String status, @Param("targetType") String targetType, @Param("targetId") Long targetId, @Param("adminId") Long adminId);
 }

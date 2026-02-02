@@ -21,8 +21,9 @@ import com.jisoo.board.domain.CommentVo;
 import com.jisoo.board.domain.MyPageDto;
 import com.jisoo.board.domain.PageDto;
 import com.jisoo.board.domain.ReportVo;
-import com.jisoo.board.domain.ReportedBoardDetailDto;
 import com.jisoo.board.domain.ReportedBoardDto;
+import com.jisoo.board.domain.ReportedCommentDto;
+import com.jisoo.board.domain.ReportedDetailDto;
 import com.jisoo.board.domain.UserSignupDto;
 import com.jisoo.board.domain.UserVo;
 import com.jisoo.board.security.SecurityUser;
@@ -58,9 +59,15 @@ public class MainController {
 	    return stats;
 	}
 	
-	private List<ReportedBoardDto> addReportedBoards(Model model){
-    	List<ReportedBoardDto> boards = adminService.selectReportedBoards();
-    	return boards;
+	private Map<String, Object> addReportedData(Model model){
+    	Map<String, Object> data = new HashMap<>();
+		List<ReportedBoardDto> boards = adminService.selectReportedBoards();
+    	List<ReportedCommentDto> comments = adminService.selectReportedComments();
+    	
+    	data.put("boards", boards);
+    	data.put("comments", comments);
+    	
+    	return data;
 	}
 	
     @GetMapping("/")
@@ -247,9 +254,6 @@ public class MainController {
     		@ModelAttribute BoardVo boardVo,
     		@AuthenticationPrincipal SecurityUser securityUser,
     		Model model) {
-//    	System.out.println("updateBoard: /board/update/" + boardId);
-//    	System.out.println("updateBoard: boardVo" + boardVo);
-//    	System.out.println("isOwner: " + boardService.isOwner(boardId, securityUser.getUserId()));
     	
     	if(securityUser == null || !boardService.isOwner(boardId, securityUser.getUserId())) {
     		return "redirect:/board";
@@ -345,10 +349,9 @@ public class MainController {
     @GetMapping("/admin")
     public String admin(Model model) {
         Map<String, Integer> stats = addStats(model);
-    	List<ReportedBoardDto> boards = addReportedBoards(model);
-
+        Map<String, Object> data = addReportedData(model);
         model.addAttribute("stats", stats);
-        model.addAttribute("boards", boards);
+        model.addAllAttributes(data);
         return "/views/admin";
     }
     
@@ -359,11 +362,13 @@ public class MainController {
 
     	Map<String, Integer> stats = addStats(model);
         List<UserVo> users = adminService.searchUsers(keyword, role, page);
-        List<ReportedBoardDto> boards = addReportedBoards(model);
-
+//        List<ReportedBoardDto> boards = addReportedData(model);
+        Map<String, Object> data = addReportedData(model);
+        
+        model.addAllAttributes(data);
         model.addAttribute("stats", stats);
         model.addAttribute("users", users);
-        model.addAttribute("boards", boards);
+//        model.addAttribute("boards", boards);
         model.addAttribute("page", page);
 
         return "views/admin";
@@ -381,22 +386,21 @@ public class MainController {
         return "redirect:/admin#users";
     }
     
-    @GetMapping("/admin/boards/{boardId}")
+    @GetMapping("/admin/{targetType}/{targetId}")
     @ResponseBody
-    public ReportedBoardDetailDto boards(@PathVariable Long boardId, Model model) {
-    	ReportedBoardDetailDto detail = adminService.getDetail(boardId);
-    	
-    	return detail;
+    public ReportedDetailDto detail(@PathVariable String targetType, @PathVariable Long targetId) {
+        return adminService.getDetail(targetType, targetId);
     }
     
     @PostMapping("/admin/report/process")
-    public String reportProcess(@RequestParam String action,
-					    	    @RequestParam Long boardId,
-					    	    @RequestParam Long userId,
+    public String reportProcess(@RequestParam String targetType,
+    							@RequestParam Long targetId,
+								@RequestParam Long userId,
+    							@RequestParam String action,
 					    	    @RequestParam(required=false) Boolean suspend,
 					    	    @RequestParam(required=false) Integer days,
 					    	    @AuthenticationPrincipal SecurityUser securityUser) {
-    	adminService.processReport(action, boardId, userId, suspend, days, securityUser.getUserId());
+    	adminService.processReport(targetType, targetId, userId, action, suspend, days, securityUser.getUserId());
     	
     	return "redirect:/admin#boards";
     }

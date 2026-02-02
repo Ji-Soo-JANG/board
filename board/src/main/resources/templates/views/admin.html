@@ -186,7 +186,7 @@
 								<table class="table table-hover align-middle">
 									<thead>
 										<tr>
-											<th style="width:80px;">ID</th>
+											<th style="width:80px;">投稿ID</th>
 											<th>タイトル</th>
 											<th style="width:160px;">作成者</th>
 											<th style="width:120px;" class="text-end">通報カウント</th>
@@ -194,10 +194,11 @@
 									</thead>
 
 									<tbody>
-										<tr th:each="b : ${boards}" th:attr="data-board-id=${b.boardId}">
+										<tr th:each="b : ${boards}" data-type="board"
+											th:attr="data-board-id=${b.boardId}">
 											<td th:text="${b.boardId}">1</td>
 											<td>
-												<a class="text-decoration-none js-report-detail reported-board"
+												<a class="text-decoration-none js-report-detail reported"
 													th:text="${b.title}">
 												</a>
 
@@ -209,6 +210,49 @@
 										<tr>
 											<td th:if="${#lists.isEmpty(boards)}" colspan="6" class="text-muted">
 												投稿がありません。</td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+
+						</div>
+					</div>
+				</section>
+
+				<!-- コメント管理 -->
+				<section id="comments" class="mb-4" sec:authorize="hasRole('ADMIN')">
+					<h4 class="mb-3">投稿管理</h4>
+
+					<div class="card shadow-sm">
+						<div class="card-body">
+							<div class="table-responsive">
+								<table class="table table-hover align-middle">
+									<thead>
+										<tr>
+											<th style="width:80px;">投稿ID</th>
+											<th>コメント</th>
+											<th style="width:160px;">作成者</th>
+											<th style="width:120px;" class="text-end">通報カウント</th>
+										</tr>
+									</thead>
+
+									<tbody>
+										<tr th:each="c : ${comments}" data-type="comment"
+											th:attr="data-comment-id=${c.commentId}">
+											<td th:text="${c.boardId}">1</td>
+											<td>
+												<a class="text-decoration-none js-report-detail reported" th:text="${#strings.length(c.content) > 10
+												          ? #strings.substring(c.content, 0, 10) + '...'
+												          : c.content}">
+												</a>
+											</td>
+											<td th:text="${c.userId}">writer</td>
+											<td class="text-end" th:text="${c.reportCount}">0</td>
+										</tr>
+
+										<tr>
+											<td th:if="${#lists.isEmpty(boards)}" colspan="6" class="text-muted">
+												コメントがありません。</td>
 										</tr>
 									</tbody>
 								</table>
@@ -258,13 +302,15 @@
 								<option value="9999">永久</option>
 							</select>
 						</div>
-	
+
 						<div class="d-flex justify-content-end gap-2">
 							<button type="button" class="btn-process btn btn-danger" data-process="resolve">削除</button>
-							<button type="button" class="btn-process btn btn-secondary" data-process="reject">却下</button>
+							<button type="button" class="btn-process btn btn-secondary"
+								data-process="reject">却下</button>
 						</div>
+						<input id="inputTargetType" name="targetType" hidden>
+						<input id="inputTargetId" name="targetId" hidden>
 						<input id="inputUserId" name="userId" hidden>
-						<input id="inputBoardId" name="boardId" hidden>
 						<input id="inputAction" name="action" hidden>
 					</form>
 
@@ -283,29 +329,40 @@
 				$(this).addClass("active");
 			});
 
-			$(".reported-board").on("click", function () {
+			$(".reported").on("click", function () {
 				const reportModal = new bootstrap.Modal("#reportDetailModal");
 				const $tr = $(this).closest("tr");
-				const boardId = $tr.data("board-id");
-				
+				const targetType = $tr.data("type");
+				var targetId;
 
-				$.get("/admin/boards/" + boardId, function (data) {
+				if (targetType === "board") {
+					targetId = $tr.data("board-id");
+				} else if (targetType === "comment") {
+					targetId = $tr.data("comment-id");
+				} else {
+					return;
+				}
+
+				if (!targetId) return;
+
+				$.get("/admin/" + targetType + "/" + targetId, function (data) {
 					console.log(data);
-					$("#inputBoardId").val(data.boardId);
+					$("#inputTargetType").val(targetType);
+					$("#inputTargetId").val(data.targetId);
 					$("#inputUserId").val(data.userId);
-					
+
 					const $ul = $("#modalReports").empty();
 					data.list.forEach(r => {
 						$ul.append(`<li class="list-unstyled">${r.reason} - ${r.detail ?? ""}</li>`);
 					});
-					$("#modalTitle").text(data.title);
+					$("#modalTitle").text(data.title ?? (targetType === "comment" ? "コメント" : ""));
 					$("#modalContent").html(data.content);
 				});
 
 				reportModal.show();
 			});
-			
-			$(".btn-process").on("click", function(){
+
+			$(".btn-process").on("click", function () {
 				console.log($(this).data("process"));
 				$("#inputAction").val($(this).data("process"));
 				$("#modalForm").attr("action", `/admin/report/process`).submit();

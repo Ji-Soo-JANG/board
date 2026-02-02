@@ -15,23 +15,6 @@
   		VALUES(#{targetType}, #{targetId}, #{reporterId}, #{reason}, #{detail})
   	</insert>
   	
-  	<select id="selectReportsByType" resultType="com.jisoo.board.domain.ReportedBoardDto">
-  		SELECT
-			r.TARGET_ID AS boardId,
-			b.TITLE     AS title,
-			b.WRITER_ID AS userId,
-			COUNT(*)    AS reportCount,
-			MAX(r.CREATED_AT) AS lastReportedAt
-		FROM TBL_BOARD b, TBL_REPORT r
-		WHERE
-			b.BOARD_ID = r.TARGET_ID
-		AND
-			r.TARGET_TYPE = #{type}
-		AND
-			r.STATUS = 'PENDING'
-		GROUP BY r.TARGET_ID, b.TITLE, b.WRITER_ID
-  	</select>
-  	
   	<select id="selectReportsById" resultType="com.jisoo.board.domain.ReportVo">
   		SELECT *
   		FROM TBL_REPORT

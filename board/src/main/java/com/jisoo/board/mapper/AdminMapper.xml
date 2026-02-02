@@ -19,4 +19,40 @@
 		WHERE
 			BOARD_ID = #{boardID}
 	</update>
+	
+	<select id="selectReportsByType" resultType="com.jisoo.board.domain.ReportedBoardDto">
+  		SELECT
+			r.TARGET_ID AS boardId,
+			b.TITLE     AS title,
+			b.WRITER_ID AS userId,
+			COUNT(*)    AS reportCount,
+			MAX(r.CREATED_AT) AS lastReportedAt
+		FROM TBL_BOARD b, TBL_REPORT r
+		WHERE
+			b.BOARD_ID = r.TARGET_ID
+		AND
+			r.TARGET_TYPE = 'BOARD'
+		AND
+			r.STATUS = 'PENDING'
+		GROUP BY r.TARGET_ID, b.TITLE, b.WRITER_ID
+  	</select>
+	
+	<select id="selectReportedComments" resultType="com.jisoo.board.domain.ReportedCommentDto">
+		SELECT
+			c.COMMENT_ID  AS commentId,
+			c.BOARD_ID    AS boardId,
+			c.WRITER_ID   AS userId,
+			c.CONTENT     AS content,
+			COUNT(*)      AS reportCount
+		FROM
+			TBL_COMMENT c
+			JOIN TBL_REPORT r
+			ON c.COMMENT_ID = r.TARGET_ID
+		WHERE
+			r.TARGET_TYPE = 'COMMENT'
+		AND
+			c.DELETED_AT IS NULL
+		GROUP BY
+			c.COMMENT_ID, c.BOARD_ID, c.WRITER_ID, c.CONTENT
+	</select>
   </mapper>

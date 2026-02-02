@@ -7,12 +7,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.jisoo.board.domain.BoardVo;
+import com.jisoo.board.domain.CommentVo;
 import com.jisoo.board.domain.ReportVo;
-import com.jisoo.board.domain.ReportedBoardDetailDto;
 import com.jisoo.board.domain.ReportedBoardDto;
+import com.jisoo.board.domain.ReportedCommentDto;
+import com.jisoo.board.domain.ReportedDetailDto;
 import com.jisoo.board.domain.UserVo;
 import com.jisoo.board.mapper.AdminMapper;
 import com.jisoo.board.mapper.BoardMapper;
+import com.jisoo.board.mapper.CommentMapper;
 import com.jisoo.board.mapper.ReportMapper;
 import com.jisoo.board.mapper.UserMapper;
 
@@ -23,12 +26,14 @@ public class AdminServiceImpl implements AdminService {
 	private BoardMapper boardMapper;
 	private UserMapper userMapper;
 	private ReportMapper reportMapper;
+	private CommentMapper commentMapper;
 	
-	public AdminServiceImpl(AdminMapper adminMapper, BoardMapper boardMapper, UserMapper userMapper, ReportMapper reportMapper) {
+	public AdminServiceImpl(AdminMapper adminMapper, BoardMapper boardMapper, UserMapper userMapper, ReportMapper reportMapper, CommentMapper commentMapper) {
 		this.adminMapper = adminMapper;
 		this.boardMapper = boardMapper;
 		this.userMapper = userMapper;
 		this.reportMapper = reportMapper;
+		this.commentMapper = commentMapper;
 	}
 
 	@Override
@@ -90,28 +95,41 @@ public class AdminServiceImpl implements AdminService {
 
 	@Override
 	public List<ReportedBoardDto> selectReportedBoards() {
-		List<ReportedBoardDto> list = reportMapper.selectReportsByType("BOARD");
+		List<ReportedBoardDto> list = adminMapper.selectReportsByType();
 		return list;
 	}
 
 	@Override
-	public ReportedBoardDetailDto getDetail(Long boardId) {
-		ReportedBoardDetailDto dto = new ReportedBoardDetailDto();
-		BoardVo boardVo = boardMapper.selectBoard(boardId);
-		List<ReportVo> list = reportMapper.selectReportsById("BOARD", boardId);
+	public ReportedDetailDto getDetail(String targetType, Long targetId) {
+		ReportedDetailDto dto = new ReportedDetailDto();
 		
-		dto.setBoardId(boardVo.getBoardId());
-		dto.setTitle(boardVo.getTitle());
-		dto.setContent(boardVo.getContent());
-		dto.setUserId(boardVo.getWriterId());
+		dto.setTargetType(targetType);
+		
+		if("board".equals(targetType)) {
+			BoardVo boardVo = boardMapper.selectBoard(targetId);
+			
+			dto.setTargetId(boardVo.getBoardId());
+			dto.setTitle(boardVo.getTitle());
+			dto.setContent(boardVo.getContent());
+			dto.setUserId(boardVo.getWriterId());
+			dto.setBoardId(dto.getTargetId());
+		}
+		else if("comment".equals(targetType)){
+			CommentVo commentVo = commentMapper.selectComment(targetId);
+			dto.setContent(commentVo.getContent());
+			dto.setBoardId(commentVo.getBoardId());
+			dto.setTargetId(commentVo.getCommentId());
+			dto.setUserId(commentVo.getWriterId());
+		}
+		
+		List<ReportVo> list = reportMapper.selectReportsById(targetType.toUpperCase(), targetId);
 		dto.setList(list);
-		
 		return dto;
 	}
 
 	@Override
 	@Transactional
-	public void processReport(String action, Long boardId, Long userId, Boolean suspend, Integer days, Long adminId) {
+	public void processReport(String targetType, Long targetId, Long userId, String action, Boolean suspend, Integer days, Long adminId) {
 	    boolean doSuspend = Boolean.TRUE.equals(suspend);
 	    int suspendDays = (days == null ? 7 : days);
 	    LocalDateTime until;
@@ -123,15 +141,29 @@ public class AdminServiceImpl implements AdminService {
 	    }
 	    
 	    if("resolve".equals(action)) {
-	    	adminMapper.deleteBoard(boardId);
+	    	if("board".equals(targetType)) {
+	    		adminMapper.deleteBoard(targetId);
+	    		System.out.println("완료됨");
+	    	}
+	    	else if("comment".equals(targetType)) {
+	    		commentMapper.deleteComment(targetId);
+	    		System.out.println("comment");
+	    	}
 	    	
 	    	if(doSuspend) {
 	    		userMapper.suspendUser(userId, until);
 	    	}
 	    }
 	    
-	    reportMapper.updateByTarget(action, "BOARD", boardId, adminId);
+	    reportMapper.updateByTarget(action, targetType.toUpperCase(), targetId, adminId);
+	    
 	    
 		return;
+	}
+
+	@Override
+	public List<ReportedCommentDto> selectReportedComments() {
+		List<ReportedCommentDto> list = adminMapper.selectReportedComments();
+		return list;
 	}
 }

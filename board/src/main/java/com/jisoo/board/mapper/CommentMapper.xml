@@ -8,6 +8,15 @@
   		INSERT INTO TBL_COMMENT(BOARD_ID, WRITER_ID, CONTENT)
   		VALUES(#{boardId}, #{writerId}, #{content})
   	</insert>
+
+	<select id="selectComment" resultType="com.jisoo.board.domain.CommentVo">
+		SELECT *
+		FROM TBL_COMMENT
+		WHERE 
+			COMMENT_ID = #{commentId}
+			AND
+			DELETED_AT IS NULL	
+	</select>
   	
   	<select id="selectComments" resultType="com.jisoo.board.domain.CommentVo">
   		SELECT *
